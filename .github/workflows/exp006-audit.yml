@@ -1,0 +1,46 @@
+name: exp006-adversarial-audit
+
+on:
+  push:
+    branches:
+      - exp006-adversarial-audit
+    paths:
+      - "src/lifelike_min/exp006_audit.py"
+      - ".github/workflows/exp006-audit.yml"
+  pull_request:
+    paths:
+      - "src/lifelike_min/exp006_audit.py"
+      - ".github/workflows/exp006-audit.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run v7 adversarial audit
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/exp006-audit
+          python -m lifelike_min.exp006_audit --json results/exp006-audit/audit.json
+
+      - name: Preserve audit evidence
+        if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp006-audit
+          path: results/exp006-audit/audit.json
+          if-no-files-found: error
