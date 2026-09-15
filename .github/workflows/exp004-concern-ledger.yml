@@ -1,0 +1,56 @@
+name: exp004-concern-ledger
+
+on:
+  push:
+    branches:
+      - exp004-concern-ledger
+    paths:
+      - "src/lifelike_min/exp004_*.py"
+      - "tests/test_exp004.py"
+      - ".github/workflows/exp004-concern-ledger.yml"
+  pull_request:
+    paths:
+      - "src/lifelike_min/exp004_*.py"
+      - "tests/test_exp004.py"
+      - ".github/workflows/exp004-concern-ledger.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run causal and reviewer tests
+        env:
+          PYTHONPATH: src
+        run: python -m unittest tests.test_exp004 -v
+
+      - name: Run matched champion challenger evaluation
+        if: matrix.python-version == '3.12'
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/exp004
+          python -m lifelike_min.exp004_evaluation \
+            --json results/exp004/report.json \
+            --compact-json results/exp004/report-compact.json
+
+      - name: Preserve EXP-004 evidence
+        if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp004-results
+          path: results/exp004
+          if-no-files-found: error
