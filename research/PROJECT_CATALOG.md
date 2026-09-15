@@ -19,18 +19,19 @@ This catalog records every investigated external system. Classification is not a
 ## PC-001: Ensemble
 
 **Classification:** RUNNABLE BASELINE  
-**Qualification state:** SOURCE VERIFIED, EXECUTION PENDING  
+**Qualification state:** SOURCE VERIFIED, EXECUTED  
 **Origin:** UC Santa Cruz, evolution of Comme il Faut from Prom Week  
 **Repository:** https://github.com/ensemble-engine/ensemble  
+**Pinned qualification revision:** `8b74bdec4ba2ef4e14795b7591df3b5d73f283e3`  
 **Purpose:** Rules-based social simulation for socially aware characters.  
 **Language:** JavaScript  
 **License:** BSD-4-Clause, University of California-specific variant  
-**Runnable evidence:** Standalone `ensemble.js`, authoring tool, `examples/loversAndRivals`, tests, release builds.  
+**Runnable evidence:** Standalone `ensemble.js`, authoring tool, `examples/loversAndRivals`, tests, release builds. EXP-001 executed the shipped Lovers and Rivals domain through native volition calculation, action selection, action execution, trigger processing, timestep advance, and subsequent action recalculation without an adapter or behavioral source modification.  
 **Core mechanisms:** Social state schemas, character history, trigger rules, volition rules, action selection, relationship and social-fact reasoning.  
 **Expected behavioral strengths:** History-dependent social differentiation, relationship-sensitive action preference, socially contextual action selection, authored social consequences.  
 **Known or suspected weaknesses to test:** Heavy authoring burden, rule coverage limits, brittleness outside authored social domains, uncertain support for non-social motives and long-term habits.  
 **Reuse note:** Permissive but includes an advertising acknowledgement clause. Preserve license text and verify distribution obligations before direct code reuse.  
-**Priority:** 1. Strong whole-system candidate for Champion 0 because the target behavior is social individuality rather than generic problem solving.
+**Priority:** 1. Strong whole-system candidate for Champion 0 because the target behavior is social individuality rather than generic problem solving. It is not yet Champion 0 because common-world adaptation and behavioral-battery evidence do not yet exist.
 
 ## PC-002: FAtiMA Toolkit
 
@@ -161,6 +162,6 @@ This catalog records every investigated external system. Classification is not a
 
 ## Baseline qualification order
 
-The initial execution queue is Ensemble, FAtiMA Toolkit, PsychSim, inBloom, then MicroPsi2 if its historical environment can be reproduced without architectural rewriting. GAMYGDALA and openc2e begin as donor tracks rather than complete-person contenders. Oz/Hap/Em and ABL remain archaeology targets until runnable source and licensing are established.
+The initial execution queue is Ensemble, FAtiMA Toolkit, PsychSim, inBloom, then MicroPsi2 if its historical environment can be reproduced without architectural rewriting. Ensemble has passed original execution only; it remains at the head of the adaptation and common-battery queue. GAMYGDALA and openc2e begin as donor tracks rather than complete-person contenders. Oz/Hap/Em and ABL remain archaeology targets until runnable source and licensing are established.
 
 This order is provisional. A newly discovered system may move ahead if evidence indicates stronger whole-character behavior, better reproducibility, or a closer match to the target.
