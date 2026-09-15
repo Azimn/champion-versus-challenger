@@ -1,0 +1,47 @@
+name: psychsim-smoke
+
+on:
+  push:
+    paths:
+      - ".github/workflows/psychsim-smoke.yml"
+  pull_request:
+    paths:
+      - ".github/workflows/psychsim-smoke.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  native-theory-of-mind-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out research workspace
+        uses: actions/checkout@v4
+
+      - name: Check out pinned PsychSim
+        uses: actions/checkout@v4
+        with:
+          repository: pynadath/psychsim
+          ref: c7b2b92e6ff8b83b2e832acda02c4baafabdf06f
+          path: external/psychsim
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.9"
+
+      - name: Execute original PsychSim mental-model test
+        shell: bash
+        run: |
+          set -o pipefail
+          PYTHONPATH="$GITHUB_WORKSPACE/external/psychsim" \
+            python -m unittest \
+            psychsim.test.tomjerry.TestAgents.testRewardModels -v \
+            2>&1 | tee psychsim-native-test.txt
+
+      - name: Preserve native qualification output
+        uses: actions/upload-artifact@v4
+        with:
+          name: psychsim-native-theory-of-mind-smoke
+          path: psychsim-native-test.txt
+          if-no-files-found: error
