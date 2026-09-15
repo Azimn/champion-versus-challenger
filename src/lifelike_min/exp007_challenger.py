@@ -33,7 +33,11 @@ class EligibilityTraceCharacter(SubjectiveFactCharacter):
     special-case expired-record rescue and makes the boundary rule deterministic.
     """
 
-    max_eligibility_records = 4
+    # EXP-007's capacity tournament found that one record loses already-earned
+    # cross-context/multiple-candidate behavior, while two records preserve the
+    # complete earned behavioral suite. Larger bounds added capacity but no
+    # demonstrated behavioral value in EXP-007.
+    max_eligibility_records = 2
     max_eligibility_age = 10
     eligibility_decay = 0.82
     habit_learning_rate = 0.35
