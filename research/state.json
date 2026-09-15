@@ -1,0 +1,62 @@
+{
+  "protocol_version": "1.0",
+  "champion": null,
+  "last_experiment": "EXP-001",
+  "candidates": {
+    "PC-001": {
+      "name": "Ensemble",
+      "classification": "RUNNABLE BASELINE",
+      "qualification_state": ["SOURCE VERIFIED", "EXECUTED"],
+      "source": "https://github.com/ensemble-engine/ensemble",
+      "execution_experiment": "EXP-001"
+    },
+    "PC-002": {
+      "name": "FAtiMA Toolkit",
+      "classification": "RUNNABLE BASELINE",
+      "qualification_state": ["SOURCE VERIFIED", "EXECUTION PENDING"],
+      "source": "https://github.com/GAIPS/FAtiMA-Toolkit"
+    },
+    "PC-003": {
+      "name": "PsychSim",
+      "classification": "RUNNABLE BASELINE",
+      "qualification_state": ["SOURCE VERIFIED", "EXECUTION PENDING"],
+      "source": "https://github.com/pynadath/psychsim"
+    },
+    "PC-004": {
+      "name": "inBloom",
+      "classification": "RUNNABLE BASELINE",
+      "qualification_state": ["SOURCE VERIFIED", "EXECUTION PENDING"],
+      "source": "https://github.com/cartisan/inBloom"
+    },
+    "PC-005": {
+      "name": "MicroPsi2",
+      "classification": "REQUIRES FURTHER INVESTIGATION",
+      "qualification_state": ["SOURCE VERIFIED", "EXECUTION PENDING"],
+      "source": "https://github.com/joschabach/micropsi2"
+    },
+    "PC-006": {
+      "name": "GAMYGDALA",
+      "classification": "MECHANISM DONOR",
+      "qualification_state": ["SOURCE VERIFIED", "EXECUTION PENDING"],
+      "source": "https://github.com/broekens/gamygdala"
+    },
+    "PC-007": {
+      "name": "openc2e / Creatures lineage",
+      "classification": "MECHANISM DONOR",
+      "qualification_state": ["SOURCE VERIFIED", "EXECUTION PENDING"],
+      "source": "https://github.com/openc2e/openc2e"
+    },
+    "PC-008": {
+      "name": "Oz Project / Hap / Em",
+      "classification": "REQUIRES FURTHER INVESTIGATION",
+      "qualification_state": ["DISCOVERED"],
+      "source": "https://www.cs.cmu.edu/Groups/oz/"
+    },
+    "PC-009": {
+      "name": "ABL / Facade lineage",
+      "classification": "REQUIRES FURTHER INVESTIGATION",
+      "qualification_state": ["DISCOVERED"],
+      "source": "https://www.cs.cmu.edu/~michaelm/publications/"
+    }
+  }
+}
