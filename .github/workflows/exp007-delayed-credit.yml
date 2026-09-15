@@ -77,3 +77,23 @@ jobs:
           name: exp007-developer-results
           path: results/exp007
           if-no-files-found: error
+
+  reviewer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run post-implementation reviewer holdouts
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/exp007-review
+          python -m lifelike_min.exp007_review --json results/exp007-review/review.json
+      - name: Preserve reviewer failures and passes
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp007-reviewer-pass-1
+          path: results/exp007-review/review.json
+          if-no-files-found: error
