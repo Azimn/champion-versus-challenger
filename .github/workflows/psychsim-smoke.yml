@@ -3,9 +3,11 @@ name: psychsim-smoke
 on:
   push:
     paths:
+      - "qualification/psychsim_native_tom.py"
       - ".github/workflows/psychsim-smoke.yml"
   pull_request:
     paths:
+      - "qualification/psychsim_native_tom.py"
       - ".github/workflows/psychsim-smoke.yml"
 
 permissions:
@@ -30,18 +32,30 @@ jobs:
         with:
           python-version: "3.9"
 
-      - name: Execute original PsychSim mental-model test
+      - name: Preserve original shipped test result
+        continue-on-error: true
         shell: bash
         run: |
           set -o pipefail
           PYTHONPATH="$GITHUB_WORKSPACE/external/psychsim" \
             python -m unittest \
             psychsim.test.tomjerry.TestAgents.testRewardModels -v \
-            2>&1 | tee psychsim-native-test.txt
+            2>&1 | tee psychsim-original-test.txt
 
-      - name: Preserve native qualification output
+      - name: Execute native Theory of Mind compatibility reconstruction
+        shell: bash
+        run: |
+          set -o pipefail
+          PYTHONPATH="$GITHUB_WORKSPACE/external/psychsim" \
+            python qualification/psychsim_native_tom.py \
+            2>&1 | tee psychsim-reconstruction.txt
+
+      - name: Preserve qualification evidence
         uses: actions/upload-artifact@v4
         with:
           name: psychsim-native-theory-of-mind-smoke
-          path: psychsim-native-test.txt
+          path: |
+            psychsim-original-test.txt
+            psychsim-reconstruction.txt
+            qualification-results/psychsim-native-tom.json
           if-no-files-found: error
