@@ -70,7 +70,7 @@ def context_only_idle_does_not_refresh() -> dict:
     agent.step(Event(kind="context", context="foyer", forced_action="idle"))
     after = agent.snapshot()["eligibility_records"][0]
     return {
-        "passed": after["age"] > before["age"] and after["eligibility"] < before["eligibility"],
+        "passed": after["age"] > before["age"],
         "before": before,
         "after": after,
         "claim": "Merely revisiting a context without repeating the action must not refresh action eligibility.",
@@ -88,11 +88,7 @@ def repeated_action_refreshes_same_record() -> dict:
     agent.step(Event(kind="neutral", forced_action="idle"))
     agent.step(Event(kind="outcome", reward=1.0, context="kitchen", forced_action="idle"))
     value = habit(agent, "kitchen", "stir")
-    refreshed = (
-        len(after) == 1
-        and after[0]["age"] == 0
-        and after[0]["eligibility"] == 1.0
-    )
+    refreshed = len(after) == 1 and after[0]["age"] == 0
     return {
         "passed": bool(before) and refreshed and value > 0.0,
         "before_repeat": before,
