@@ -9,7 +9,8 @@ This file records the evidence used to seed the project and mechanism catalogs. 
 **README evidence:** Project describes Ensemble as a framework for socially aware characters and an evolution of Comme il Faut from Prom Week.  
 **Runnable artifacts inspected:** `examples/loversAndRivals/`, `tests/`, `build-library.js`, shipped `examples/loversAndRivals/ensemble.js`.  
 **License evidence:** `LICENSE.md`, BSD 4-clause University of California variant.  
-**Qualification note:** The shipped Lovers and Rivals bundle is preferred over regenerating it because the historical build script performs asynchronous appends that can reorder bundle modules on a modern host.
+**Qualification evidence:** EXP-001 executed the pinned shipped Lovers and Rivals bundle successfully in GitHub Actions run `34939796873`, artifact ID `10384588014`. The run used no common-world adapter and did not modify Ensemble's architecture.  
+**Compatibility note:** The browser-oriented bundle requires global `_`, supplied externally by the Node host. The historical `build-library.js` performs asynchronous module appends and can generate a reordered bundle on a modern host, so qualification uses the fixed standalone bundle already shipped with Lovers and Rivals rather than repairing candidate source.
 
 ## PC-002 FAtiMA Toolkit
 
