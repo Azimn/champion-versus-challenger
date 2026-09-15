@@ -92,11 +92,27 @@ Falsification probe: a morning routine must not leak into an unrelated evening c
 
 Known limitation: this is simple cached action tendency, not sequence learning or skill acquisition.
 
+## Cycle 5
+
+Observed artificiality failure: the character can remember how it feels about another person but cannot learn what that person is likely to do from observations of that person's behavior.
+
+Prior-art donor family: PsychSim's explicit models of other agents and observation-driven model updating.
+
+Minimal hypothesis: full recursive Theory of Mind is not required for the first useful social-prediction gain. A single partner-specific reliability estimate should be enough to distinguish a repeatedly reliable actor from a repeatedly unreliable one when deciding whether to delegate or verify.
+
+Challenger: `v5_partner_model`.
+
+Added mechanism: one signed reliability estimate per observed partner. Reliable evidence raises the estimate, unreliable evidence lowers it, and the value biases delegation versus verification.
+
+Falsification probe: evidence about Alex must not change behavior toward Blake, and later contradictory evidence about Alex must be able to reverse the prediction.
+
+Known limitation: this is a first-order behavioral model, not recursive Theory of Mind. It does not represent another agent's beliefs, goals, false beliefs, or beliefs about the character.
+
 ## Reviewer role
 
 The reviewer is adversarial. A challenger is not promoted because it passes its target scenario. The reviewer independently tries to expose a cheaper explanation or a side effect that would make the character look less like a persistent individual.
 
-The initial reviewer probes test partner specificity, emotional recovery, concern cancellation, and habit context specificity. Future cycles should add adversarial probes before implementation whenever possible.
+The initial reviewer probes test partner specificity, emotional recovery, concern cancellation, habit context specificity, social-model specificity, and social-model revision. Future cycles should add adversarial probes before implementation whenever possible.
 
 ## Complexity accounting
 
@@ -104,8 +120,8 @@ Every version records median decision time, a representative serialized persiste
 
 The experiment also reports behavioral probes passed per mechanism. This ratio is a diagnostic, not an optimization oracle. A mechanism can still be rejected for severe qualitative regressions even if the ratio rises.
 
-## Next confirmed gaps after v4
+## Next confirmed gaps after v5
 
-If v4 survives its first evaluation, the next failures to attack should be multi-motive conflict, prospective memory with deadlines, limited knowledge and simple social prediction, differentiated forgetting, and habit reversal under changed contingencies.
+If v5 survives evaluation, the next artificiality attacks should focus on multi-motive conflict, prospective memory with deadlines, false belief and limited knowledge, differentiated forgetting, habit reversal under changed contingencies, and multi-step spontaneous activity.
 
 Do not add these mechanisms until a scenario demonstrates the failure in the current champion.
