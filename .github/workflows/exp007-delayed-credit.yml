@@ -117,3 +117,43 @@ jobs:
           name: exp007-reviewer-pass-2
           path: results/exp007-review2/review.json
           if-no-files-found: error
+
+  reviewer3:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run simplification-specific holdouts
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/exp007-review3
+          python -m lifelike_min.exp007_review3 --json results/exp007-review3/review.json
+      - name: Preserve reviewer pass 3
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp007-reviewer-pass-3
+          path: results/exp007-review3/review.json
+          if-no-files-found: error
+
+  final-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run final EXP-007 validation, capacity tournament, subjective-boundary audit, and cost audit
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/exp007-final
+          python -m lifelike_min.exp007_final_validation --json results/exp007-final/final-validation.json
+      - name: Preserve final validation evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp007-final-validation
+          path: results/exp007-final/final-validation.json
+          if-no-files-found: error
