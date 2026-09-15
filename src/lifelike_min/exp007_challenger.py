@@ -12,23 +12,24 @@ class EligibilityRecord:
 
     context: str
     action: str
-    eligibility: float
     age: int
 
 
 class EligibilityTraceCharacter(SubjectiveFactCharacter):
-    """EXP-007 challenger for delayed consequence credit.
+    """EXP-007 challenger for context-cued delayed consequence credit.
 
     This is intentionally not a general reinforcement-learning system. The only new
     persistent mechanism is a tiny finite set of recent context-action records. A
     later experienced outcome may update a prior action only when its experienced
     context uniquely identifies a live eligible action.
+
+    Eligibility strength is derived from age rather than stored independently. This
+    removes redundant persistent state while preserving deterministic decay.
     """
 
     max_eligibility_records = 4
     max_eligibility_age = 10
     eligibility_decay = 0.82
-    minimum_eligibility = 0.05
     habit_learning_rate = 0.35
 
     def __init__(self) -> None:
@@ -40,17 +41,16 @@ class EligibilityTraceCharacter(SubjectiveFactCharacter):
         # never serialized.
         self._expired_this_tick: list[EligibilityRecord] = []
 
+    def _eligibility(self, row: EligibilityRecord) -> float:
+        return self.eligibility_decay ** row.age
+
     def _drift(self) -> None:
         self._expired_this_tick = []
         super()._drift()
         survivors: list[EligibilityRecord] = []
         for row in self.eligibility_records:
             row.age += 1
-            row.eligibility *= self.eligibility_decay
-            if (
-                row.age <= self.max_eligibility_age
-                and row.eligibility >= self.minimum_eligibility
-            ):
+            if row.age <= self.max_eligibility_age:
                 survivors.append(row)
             else:
                 self._expired_this_tick.append(row)
@@ -58,13 +58,15 @@ class EligibilityTraceCharacter(SubjectiveFactCharacter):
 
     def _bound_eligibility(self) -> None:
         while len(self.eligibility_records) > self.max_eligibility_records:
-            # Remove the least eligible record. At equal eligibility, remove the
-            # older one. The rule is deterministic and independent of list order.
+            oldest_age = max(row.age for row in self.eligibility_records)
+            oldest = [
+                index
+                for index, row in enumerate(self.eligibility_records)
+                if row.age == oldest_age
+            ]
             victim = min(
-                range(len(self.eligibility_records)),
+                oldest,
                 key=lambda index: (
-                    self.eligibility_records[index].eligibility,
-                    -self.eligibility_records[index].age,
                     self.eligibility_records[index].context,
                     self.eligibility_records[index].action,
                 ),
@@ -78,14 +80,12 @@ class EligibilityTraceCharacter(SubjectiveFactCharacter):
         # existing record instead of accumulating duplicates.
         for row in self.eligibility_records:
             if row.context == context and row.action == action:
-                row.eligibility = 1.0
                 row.age = 0
                 return
         self.eligibility_records.append(
             EligibilityRecord(
                 context=context,
                 action=action,
-                eligibility=1.0,
                 age=0,
             )
         )
@@ -105,10 +105,10 @@ class EligibilityTraceCharacter(SubjectiveFactCharacter):
             # The experienced context is either unsupported or causally ambiguous.
             # The organism does not infer a hidden simulator cause.
             return False
-        row = max(candidates, key=lambda item: item.eligibility)
+        row = min(candidates, key=lambda item: item.age)
         key = (row.context, row.action)
         updated = self.habits.get(key, 0.0) + (
-            self.habit_learning_rate * event.reward * row.eligibility
+            self.habit_learning_rate * event.reward * self._eligibility(row)
         )
         self.habits[key] = self._clamp(updated, -1.0, 1.0)
         return True
@@ -147,7 +147,6 @@ class EligibilityTraceCharacter(SubjectiveFactCharacter):
             {
                 "context": row.context,
                 "action": row.action,
-                "eligibility": round(row.eligibility, 6),
                 "age": row.age,
             }
             for row in sorted(
