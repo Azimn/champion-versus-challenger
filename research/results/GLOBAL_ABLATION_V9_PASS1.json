@@ -1,0 +1,27 @@
+{
+  "frozen_v9_earned_suite_passed": true,
+  "frozen_v9_failures": [],
+  "phase": "GLOBAL STRUCTURAL ABLATION v9, pass 1",
+  "removal_tournament": {
+    "affect_residue": {"earned_suite_passed": false, "failures": ["recovery_inertia"]},
+    "affiliation_pressure": {"earned_suite_passed": true, "failures": [], "base_need_roles": {"affiliation_drives_unscripted_social_approach": false, "choices": {"affiliation": "idle", "competence": "work", "fatigue": "rest"}, "competence_drives_work_after_rest": true, "fatigue_drives_rest": true}},
+    "competence_pressure": {"earned_suite_passed": false, "failures": ["prospective_cue"], "base_need_roles": {"affiliation_drives_unscripted_social_approach": true, "choices": {"affiliation": "socialize:Stranger", "competence": "idle", "fatigue": "rest"}, "competence_drives_work_after_rest": false, "fatigue_drives_rest": true}},
+    "concern_ledger": {"earned_suite_passed": false, "failures": ["exp004_bounded_capacity", "exp004_duplicate_assignment", "exp004_interruption", "exp004_reverse_order", "exp005_multiple_future", "exp005_one_shot", "multiple_concerns", "prospective_cue", "unfinished_concern"]},
+    "delayed_credit_trace": {"earned_suite_passed": false, "failures": ["action_order_invariance", "cross_context", "delayed_negative_1", "delayed_negative_3", "delayed_negative_8", "delayed_positive_1", "delayed_positive_3", "delayed_positive_8", "multiple_candidates"]},
+    "fatigue_pressure": {"earned_suite_passed": true, "failures": [], "base_need_roles": {"affiliation_drives_unscripted_social_approach": true, "choices": {"affiliation": "socialize:Stranger", "competence": "work", "fatigue": "work"}, "competence_drives_work_after_rest": true, "fatigue_drives_rest": false}},
+    "habit_learning": {"earned_suite_passed": false, "failures": ["action_order_invariance", "cross_context", "delayed_negative_1", "delayed_negative_3", "delayed_negative_8", "delayed_positive_1", "delayed_positive_3", "delayed_positive_8", "habit_formation", "immediate_control", "multiple_candidates"]},
+    "partner_reliability": {"earned_suite_passed": false, "failures": ["exp003_person_specificity", "exp003_reversal", "social_prediction"]},
+    "prospective_commitments": {"earned_suite_passed": false, "failures": ["exp005_bounded_store", "exp005_multiple_future", "exp005_one_shot", "exp005_wrong_cues", "prospective_cue"]},
+    "relationship_history": {"earned_suite_passed": false, "failures": ["history_divergence"]},
+    "subjective_facts": {"earned_suite_passed": false, "failures": ["exp006_entity_specificity", "exp006_hidden_not_omniscient", "exp006_observed_revision", "exp006_perception_order", "subjective_fact"]},
+    "uncertainty_policy": {"earned_suite_passed": false, "failures": ["exp003_person_specificity", "uncertainty_order"]}
+  },
+  "simplification_tournament": {
+    "frozen_v9": {"earned_suite_passed": true, "failures": [], "fresh_persistent_bytes": 361, "representative_persistent_bytes": 524, "mechanism_count": 12},
+    "H1_derived_concern_view": {"earned_suite_passed": true, "failures": [], "fresh_persistent_bytes": 312, "representative_persistent_bytes": 462, "mechanism_count": 11},
+    "H2_trace_backed_immediate_habit": {"earned_suite_passed": true, "failures": [], "fresh_persistent_bytes": 318, "representative_persistent_bytes": 475, "mechanism_count": 12},
+    "H1_H2_combined": {"earned_suite_passed": true, "failures": [], "fresh_persistent_bytes": 269, "representative_persistent_bytes": 413, "mechanism_count": 11}
+  },
+  "ci_run": 35026312609,
+  "artifact_id": 10419223685
+}
