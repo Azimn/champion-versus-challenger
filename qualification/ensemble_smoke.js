@@ -9,25 +9,25 @@ function fail(message) {
 }
 
 const candidateRoot = path.resolve(process.argv[2] || "external/ensemble");
-const builtLibrary = path.join(candidateRoot, "build", "ensemble.js");
+const shippedLibrary = path.join(candidateRoot, "examples", "loversAndRivals", "ensemble.js");
 const underscorePath = path.join(candidateRoot, "ensemble", "jslib", "underscore-min.js");
 const dataRoot = path.join(candidateRoot, "examples", "loversAndRivals", "data");
 
-if (!fs.existsSync(builtLibrary)) {
-  fail(`Ensemble build not found: ${builtLibrary}`);
+if (!fs.existsSync(shippedLibrary)) {
+  fail(`Shipped Lovers and Rivals Ensemble library not found: ${shippedLibrary}`);
 }
 
 // ENVIRONMENT COMPATIBILITY SHIM ONLY.
-// Ensemble's standalone browser bundle expects Underscore to exist as the
-// global `_` symbol. Node loads the bundled Underscore through CommonJS, so
-// provide the same global binding before evaluating the unmodified build.
+// The shipped browser bundle expects Underscore to exist as the global `_`
+// symbol. Node loads Underscore through CommonJS, so provide the equivalent
+// browser-global binding before evaluating the unmodified shipped bundle.
 const underscoreModule = require(underscorePath);
 global._ = underscoreModule._ || underscoreModule;
 
-require(builtLibrary);
+require(shippedLibrary);
 const api = global.ensemble;
 if (!api) {
-  fail("Ensemble standalone build did not expose global.ensemble");
+  fail("Shipped Ensemble bundle did not expose global.ensemble");
 }
 
 function loadJson(name) {
@@ -78,7 +78,8 @@ const result = {
   candidate: "Ensemble",
   upstream_commit: "8b74bdec4ba2ef4e14795b7591df3b5d73f283e3",
   upstream_domain: "examples/loversAndRivals",
-  execution_type: "ORIGINAL DOMAIN SMOKE",
+  upstream_artifact: "examples/loversAndRivals/ensemble.js",
+  execution_type: "ORIGINAL SHIPPED DOMAIN SMOKE",
   adapter_used: false,
   architecture_modified: false,
   environment_compatibility_shims: ["Provide browser-global `_` in Node host"],
