@@ -25,6 +25,12 @@ class EligibilityTraceCharacter(SubjectiveFactCharacter):
 
     Eligibility strength is derived from age rather than stored independently. This
     removes redundant persistent state while preserving deterministic decay.
+
+    Temporal rule: an existing eligibility record is available to the event that
+    arrives while the record is live. After that event is processed, existing
+    records age once and records beyond the finite lifetime disappear. A contextual
+    action selected during the event is then recorded at age zero. This avoids a
+    special-case expired-record rescue and makes the boundary rule deterministic.
     """
 
     max_eligibility_records = 4
@@ -35,25 +41,16 @@ class EligibilityTraceCharacter(SubjectiveFactCharacter):
     def __init__(self) -> None:
         super().__init__()
         self.eligibility_records: list[EligibilityRecord] = []
-        # Transient only. If a record was live at the start of the current event but
-        # crossed its expiry boundary during this event's drift, the arriving event
-        # may still resolve it. The list is cleared on every subsequent drift and is
-        # never serialized.
-        self._expired_this_tick: list[EligibilityRecord] = []
 
     def _eligibility(self, row: EligibilityRecord) -> float:
         return self.eligibility_decay ** row.age
 
-    def _drift(self) -> None:
-        self._expired_this_tick = []
-        super()._drift()
+    def _advance_eligibility_age(self) -> None:
         survivors: list[EligibilityRecord] = []
         for row in self.eligibility_records:
             row.age += 1
             if row.age <= self.max_eligibility_age:
                 survivors.append(row)
-            else:
-                self._expired_this_tick.append(row)
         self.eligibility_records = survivors
 
     def _bound_eligibility(self) -> None:
@@ -76,8 +73,8 @@ class EligibilityTraceCharacter(SubjectiveFactCharacter):
     def _create_eligibility(self, context: str, action: str) -> None:
         if self.max_eligibility_records <= 0 or not context or not action:
             return
-        # Replacing trace: repeating the same context-action pair refreshes the
-        # existing record instead of accumulating duplicates.
+        # Repeating the same context-action pair refreshes one record instead of
+        # accumulating duplicate records.
         for row in self.eligibility_records:
             if row.context == context and row.action == action:
                 row.age = 0
@@ -92,9 +89,7 @@ class EligibilityTraceCharacter(SubjectiveFactCharacter):
         self._bound_eligibility()
 
     def _context_candidates(self, context: str) -> list[EligibilityRecord]:
-        current = [row for row in self.eligibility_records if row.context == context]
-        boundary = [row for row in self._expired_this_tick if row.context == context]
-        return current + boundary
+        return [row for row in self.eligibility_records if row.context == context]
 
     def _apply_delayed_outcome(self, event: Event) -> bool:
         if not event.context or event.reward == 0.0:
@@ -129,8 +124,15 @@ class EligibilityTraceCharacter(SubjectiveFactCharacter):
             # silently update whichever unrelated action happened most recently.
             if not self._apply_delayed_outcome(event):
                 self._apply_immediate_outcome(event)
-            return 0.0, 0.0
-        return super()._process_event(event)
+            result = (0.0, 0.0)
+        else:
+            result = super()._process_event(event)
+
+        # Event-indexed evidence ages after the arriving event has had access to the
+        # state that existed at event arrival. Action effects run after this method,
+        # so a contextual action executed in the current event is stored at age 0.
+        self._advance_eligibility_age()
+        return result
 
     def _apply_action_effects(self, action: str, event: Event) -> None:
         super()._apply_action_effects(action, event)
