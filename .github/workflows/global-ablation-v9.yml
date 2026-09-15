@@ -6,6 +6,7 @@ on:
       - global-structural-ablation-v9
     paths:
       - "src/lifelike_min/global_ablation_v9*.py"
+      - "src/lifelike_min/global_consolidation_v9.py"
       - "src/lifelike_min/v9_compact*.py"
       - "research/experiments/GLOBAL_ABLATION_V9.md"
       - "research/results/GLOBAL_ABLATION_V9*.json"
@@ -13,6 +14,7 @@ on:
   pull_request:
     paths:
       - "src/lifelike_min/global_ablation_v9*.py"
+      - "src/lifelike_min/global_consolidation_v9.py"
       - "src/lifelike_min/v9_compact*.py"
       - "research/experiments/GLOBAL_ABLATION_V9.md"
       - "research/results/GLOBAL_ABLATION_V9*.json"
@@ -49,9 +51,14 @@ jobs:
           PYTHONPATH: src
         run: |
           python -m lifelike_min.v9_compact_review --json results/global-ablation-v9/compact-review.json
+      - name: Run remaining pairwise consolidation experiments
+        env:
+          PYTHONPATH: src
+        run: |
+          python -m lifelike_min.global_consolidation_v9 --json results/global-ablation-v9/pairwise-consolidation.json
       - name: Preserve global ablation evidence
         uses: actions/upload-artifact@v4
         with:
-          name: global-ablation-v9-structural-review
+          name: global-ablation-v9-pairwise
           path: results/global-ablation-v9
           if-no-files-found: error
