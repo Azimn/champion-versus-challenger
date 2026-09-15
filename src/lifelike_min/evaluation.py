@@ -15,6 +15,7 @@ TARGET_PROBES = (
     "recovery_inertia",
     "unfinished_concern",
     "habit_formation",
+    "social_prediction",
 )
 
 
@@ -110,6 +111,47 @@ def probe_habit_formation(version: Version) -> dict:
     return {"passed": passed, "choice": action, "trace": agent.trace}
 
 
+def _train_reliability(
+    agent: PersistentCharacter,
+    actor: str,
+    kind: str,
+    count: int,
+) -> None:
+    for _ in range(count):
+        agent.step(Event(kind=kind, actor=actor, forced_action="idle"))
+
+
+def probe_social_prediction(version: Version) -> dict:
+    reliable = PersistentCharacter(version)
+    _train_reliability(reliable, "Alex", "observed_reliable", 4)
+    reliable_action = reliable.step(
+        Event(
+            kind="request",
+            actor="Alex",
+            available_actions=("verify:Alex", "delegate:Alex"),
+        )
+    )
+
+    unreliable = PersistentCharacter(version)
+    _train_reliability(unreliable, "Alex", "observed_unreliable", 4)
+    unreliable_action = unreliable.step(
+        Event(
+            kind="request",
+            actor="Alex",
+            available_actions=("verify:Alex", "delegate:Alex"),
+        )
+    )
+
+    passed = reliable_action == "delegate:Alex" and unreliable_action == "verify:Alex"
+    return {
+        "passed": passed,
+        "reliable_history_choice": reliable_action,
+        "unreliable_history_choice": unreliable_action,
+        "reliable_trace": reliable.trace,
+        "unreliable_trace": unreliable.trace,
+    }
+
+
 def reviewer_relationship_specificity(version: Version) -> dict:
     agent = PersistentCharacter(version)
     for _ in range(3):
@@ -181,6 +223,35 @@ def reviewer_habit_context_specificity(version: Version) -> dict:
     }
 
 
+def reviewer_partner_model_specificity_and_reversal(version: Version) -> dict:
+    agent = PersistentCharacter(version)
+    _train_reliability(agent, "Alex", "observed_reliable", 4)
+
+    unrelated = agent.step(
+        Event(
+            kind="request",
+            actor="Blake",
+            available_actions=("verify:Blake", "delegate:Blake"),
+        )
+    )
+
+    _train_reliability(agent, "Alex", "observed_unreliable", 6)
+    reversed_choice = agent.step(
+        Event(
+            kind="request",
+            actor="Alex",
+            available_actions=("verify:Alex", "delegate:Alex"),
+        )
+    )
+
+    return {
+        "passed": unrelated == "verify:Blake" and reversed_choice == "verify:Alex",
+        "unrelated_partner_choice": unrelated,
+        "choice_after_reversal_evidence": reversed_choice,
+        "trace": agent.trace,
+    }
+
+
 def probe_surface_invariance(version: Version) -> dict:
     without_surface = PersistentCharacter(version)
     with_surface = PersistentCharacter(version)
@@ -217,6 +288,7 @@ def target_results(version: Version) -> dict:
         "recovery_inertia": probe_recovery_inertia(version),
         "unfinished_concern": probe_unfinished_concern(version),
         "habit_formation": probe_habit_formation(version),
+        "social_prediction": probe_social_prediction(version),
         "surface_invariance": probe_surface_invariance(version),
     }
 
@@ -236,6 +308,8 @@ def seed_representative_state(agent: PersistentCharacter) -> None:
             )
         )
         agent.step(Event(kind="outcome", reward=1.0, forced_action="idle"))
+    if agent.has_partner_model:
+        agent.step(Event(kind="observed_reliable", actor="Alex", forced_action="idle"))
 
 
 def benchmark(version: Version, repeats: int = 7, ticks: int = 3000) -> dict:
@@ -324,7 +398,12 @@ def run_cycle(
 
 
 def compact_probe(probe: dict) -> dict:
-    return {key: value for key, value in probe.items() if key != "trace"}
+    compact = {}
+    for key, value in probe.items():
+        if key == "trace" or key.endswith("_trace"):
+            continue
+        compact[key] = value
+    return compact
 
 
 def compact_cycle(cycle: dict) -> dict:
@@ -372,6 +451,19 @@ def run_experiment() -> dict:
             "habit_context_specificity",
             reviewer_habit_context_specificity,
             ("history_divergence", "recovery_inertia", "unfinished_concern"),
+        ),
+        (
+            Version.HABIT,
+            Version.PARTNER_MODEL,
+            "social_prediction",
+            "partner_model_specificity_and_reversal",
+            reviewer_partner_model_specificity_and_reversal,
+            (
+                "history_divergence",
+                "recovery_inertia",
+                "unfinished_concern",
+                "habit_formation",
+            ),
         ),
     )
 
