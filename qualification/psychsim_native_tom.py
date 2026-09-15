@@ -12,7 +12,6 @@ import json
 import os
 
 from psychsim.agent import Agent
-from psychsim.probability import Distribution
 from psychsim.pwl import stateKey, modelKey, makeTree, incrementMatrix
 from psychsim.reward import maximizeFeature, minimizeFeature
 from psychsim.world import World
@@ -38,7 +37,7 @@ def main():
     world.defineState(jerry.name, "health", int, lo=0, hi=100)
     world.setState(jerry.name, "health", 50)
 
-    chase = tom.addAction({"verb": "chase", "object": jerry.name})
+    tom.addAction({"verb": "chase", "object": jerry.name})
     hit = tom.addAction({"verb": "hit", "object": jerry.name})
     jerry.addAction({"verb": "run away"})
     jerry.addAction({"verb": "trick", "object": tom.name})
@@ -60,7 +59,11 @@ def main():
     )
 
     world.setOrder([tom.name])
-    world.setModel(jerry.name, True)
+
+    # world.addAgent already creates Jerry's native default model (Jerry0).
+    # The historical test's world.setModel(jerry.name, True) is stale against
+    # the pinned implementation, where model state contains registered model
+    # symbols rather than the boolean True. Do not replace Jerry's true model.
     world.setMentalModel(jerry.name, tom.name, {"friend": 0.5, "foe": 0.5})
 
     actions = {tom.name: hit}
@@ -97,7 +100,10 @@ def main():
         "candidate_source_modified": False,
         "adapter_used": False,
         "source_test_reference": "psychsim/test/tomjerry.py::TestAgents.testRewardModels",
-        "compatibility_difference": "reward helper calls include the agent argument required by reward.py at the same pinned commit",
+        "compatibility_differences": [
+            "reward helper calls include the agent argument required by reward.py at the same pinned commit",
+            "Jerry retains the native default model created by world.addAgent instead of the stale boolean True model assignment",
+        ],
         "observations": {
             "foe_probability_after_first_hit": prob01,
             "foe_probability_after_high_rationality_hit": prob10,
