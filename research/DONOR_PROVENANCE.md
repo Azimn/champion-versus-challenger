@@ -64,11 +64,13 @@ Reuse boundary: the current habit challenger is a generic bounded context-action
 
 Repositories: https://github.com/usc-psychsim/psychsim and historical https://github.com/pynadath/psychsim
 
-Role in this branch: future donor and comparison baseline for explicit beliefs about other agents and Theory of Mind.
+Reference family: Pynadath and Marsella's PsychSim work on decision-theoretic agents with explicit models of other agents, observation-sensitive beliefs, and Theory of Mind.
+
+Role in this branch: conceptual donor for Cycle 5 social prediction. PsychSim demonstrates the value of maintaining explicit models of other actors and updating those models from observed behavior. The experimental challenger intentionally tests whether a much smaller first-order reliability estimate can obtain useful behavioral leverage before recursive Theory of Mind is justified.
 
 License: MIT for the open-source implementation.
 
-Reuse boundary: no PsychSim implementation is used by the current four cycles. It is reserved for a later tournament against cheaper social-prediction mechanisms if the current champion demonstrates a prediction failure.
+Reuse boundary: no PsychSim source code, domain files, reward functions, or tests are incorporated into `lifelike_min`. Cycle 5 is an independently written scalar partner model. PsychSim remains available for a later direct mechanism tournament if false-belief or recursive social-reasoning failures demonstrate that the scalar model is insufficient.
 
 ## Licensing rule
 
