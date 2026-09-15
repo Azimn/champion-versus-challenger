@@ -56,9 +56,14 @@ jobs:
           PYTHONPATH: src
         run: |
           python -m lifelike_min.global_consolidation_v9_v2 --json results/global-ablation-v9/pairwise-consolidation.json
+      - name: Run concern and prospective capacity tournament
+        env:
+          PYTHONPATH: src
+        run: |
+          python -m lifelike_min.v9_compact_capacity --json results/global-ablation-v9/capacity-tournament.json
       - name: Preserve global ablation evidence
         uses: actions/upload-artifact@v4
         with:
-          name: global-ablation-v9-pairwise
+          name: global-ablation-v9-full-review
           path: results/global-ablation-v9
           if-no-files-found: error
