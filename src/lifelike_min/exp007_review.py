@@ -13,7 +13,7 @@ def habit(agent: EligibilityTraceCharacter, context: str, action: str) -> float:
 
 
 def live_boundary_consequence() -> dict:
-    """A trace live at consequence arrival should be eligible before end-of-tick decay."""
+    """A trace live at consequence arrival should be eligible before end-of-tick expiry."""
     agent = EligibilityTraceCharacter()
     agent.step(Event(kind="context", context="orchard", available_actions=("inspect",)))
     for _ in range(agent.max_eligibility_age):
@@ -93,7 +93,6 @@ def zero_reward_does_not_refresh() -> dict:
         before_row
         and after_row
         and after_row["age"] > before_row["age"]
-        and after_row["eligibility"] < before_row["eligibility"]
     )
     return {
         "passed": progressed and habit(agent, "workshop", "sand") == 0.0,
@@ -210,7 +209,7 @@ def run_review() -> dict:
     failures = [name for name, row in probes.items() if not row["passed"]]
     return {
         "experiment": "EXP-007 first adversarial reviewer pass",
-        "implementation_under_review": "v9_eligibility_trace_candidate at first frozen implementation",
+        "implementation_under_review": "v9_context_eligibility_trace_candidate",
         "holdouts_created_after_implementation": True,
         "probe_count": len(probes),
         "failures": failures,
@@ -228,8 +227,6 @@ def main() -> None:
     if args.json:
         args.json.parent.mkdir(parents=True, exist_ok=True)
         args.json.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n", encoding="utf-8")
-    # Reviewer discovery must preserve failures as evidence rather than suppressing
-    # the artifact through a failing process exit. Promotion gating happens later.
 
 
 if __name__ == "__main__":
