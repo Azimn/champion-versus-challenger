@@ -26,8 +26,8 @@ The first comparison cohort is Ensemble, PsychSim, and FAtiMA Toolkit. Additiona
 | B01 History Divergence | NOT TESTED | NOT TESTED | NOT TESTED |
 | B02 Social Differentiation | NOT TESTED | NOT TESTED | NOT TESTED |
 | B03 Unfinished Concern | NOT TESTED | NOT TESTED | NOT TESTED |
+| B05 Recovery Inertia | NOT TESTED | NOT TESTED | NOT TESTED |
 | B09 False Belief and Limited Knowledge | NOT TESTED | NOT TESTED | NOT TESTED |
-| Emotional inertia | NOT TESTED | NOT TESTED | NOT TESTED |
 | Motive competition | NOT TESTED | NOT TESTED | NOT TESTED |
 | Consequence learning | NOT TESTED | NOT TESTED | NOT TESTED |
 | Spontaneous activity | NOT TESTED | NOT TESTED | NOT TESTED |
@@ -44,7 +44,7 @@ The first comparison cohort is Ensemble, PsychSim, and FAtiMA Toolkit. Additiona
 Champion 0 remains unassigned until all three candidates have either completed or explicitly failed the following minimum evidence set:
 
 1. Original native execution through a meaningful state transition.
-2. Thin-adapter attempt for B01, B02, B03, and B09.
+2. Thin-adapter attempt for B01, B02, B03, B05, and B09.
 3. Preserved common traces for every expressible core scenario.
 4. Initial latency and memory measurement.
 5. Artificiality notes identifying the most obvious longitudinal failure.
