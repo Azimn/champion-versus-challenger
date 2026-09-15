@@ -138,22 +138,22 @@ jobs:
           path: results/exp007-review3/review.json
           if-no-files-found: error
 
-  final-validation:
+  closeout:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
         with:
           python-version: "3.12"
-      - name: Run final EXP-007 validation, capacity tournament, subjective-boundary audit, and cost audit
+      - name: Run strict EXP-007 closeout, capacity tournament, subjective-boundary audit, and cost audit
         env:
           PYTHONPATH: src
         run: |
-          mkdir -p results/exp007-final
-          python -m lifelike_min.exp007_final_validation --json results/exp007-final/final-validation.json
-      - name: Preserve final validation evidence
+          mkdir -p results/exp007-closeout
+          python -m lifelike_min.exp007_closeout --json results/exp007-closeout/closeout.json
+      - name: Preserve closeout evidence
         uses: actions/upload-artifact@v4
         with:
-          name: exp007-final-validation
-          path: results/exp007-final/final-validation.json
+          name: exp007-closeout
+          path: results/exp007-closeout/closeout.json
           if-no-files-found: error
