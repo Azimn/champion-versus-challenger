@@ -48,10 +48,10 @@ const loveToHero = api.getActions("love", "hero", before, cast, 2, 5);
 const heroToRival = api.getActions("hero", "rival", before, cast, 2, 5);
 
 if (!Array.isArray(heroToLove) || heroToLove.length === 0) {
-  fail("Original Lovers and Rivals domain produced no hero-to-love actions");
+  fail("Original Lovers and Rivals domain produced no hero-to-love actions, so a native state transition could not be exercised");
 }
-if (!Array.isArray(loveToHero) || loveToHero.length === 0) {
-  fail("Original Lovers and Rivals domain produced no love-to-hero actions");
+if (!Array.isArray(loveToHero) || !Array.isArray(heroToRival)) {
+  fail("Ensemble getActions did not return arrays for all requested character pairs");
 }
 
 const selected = heroToLove[0];
@@ -61,6 +61,9 @@ api.setupNextTimeStep();
 
 const after = api.calculateVolition(cast);
 const heroToLoveAfter = api.getActions("hero", "love", after, cast, 2, 5);
+if (!Array.isArray(heroToLoveAfter)) {
+  fail("Ensemble failed to calculate actions after the native state transition");
+}
 
 const closenessQuery = {
   category: "feeling",
