@@ -1,0 +1,47 @@
+name: ensemble-smoke
+
+on:
+  push:
+    paths:
+      - "qualification/ensemble_smoke.js"
+      - ".github/workflows/ensemble-smoke.yml"
+  pull_request:
+    paths:
+      - "qualification/ensemble_smoke.js"
+      - ".github/workflows/ensemble-smoke.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  original-domain-smoke:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out research workspace
+        uses: actions/checkout@v4
+
+      - name: Check out pinned Ensemble
+        uses: actions/checkout@v4
+        with:
+          repository: ensemble-engine/ensemble
+          ref: 8b74bdec4ba2ef4e14795b7591df3b5d73f283e3
+          path: external/ensemble
+
+      - name: Set up Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "20"
+
+      - name: Build original standalone Ensemble library
+        working-directory: external/ensemble
+        run: node build-library.js archaeology-8b74bdec
+
+      - name: Execute original Lovers and Rivals domain
+        run: node qualification/ensemble_smoke.js external/ensemble
+
+      - name: Preserve qualification result
+        uses: actions/upload-artifact@v4
+        with:
+          name: ensemble-original-domain-smoke
+          path: qualification-results/ensemble-smoke.json
+          if-no-files-found: error
