@@ -1,0 +1,43 @@
+name: global-ablation-v9
+
+on:
+  push:
+    branches:
+      - global-structural-ablation-v9
+    paths:
+      - "src/lifelike_min/global_ablation_v9.py"
+      - "research/experiments/GLOBAL_ABLATION_V9.md"
+      - ".github/workflows/global-ablation-v9.yml"
+  pull_request:
+    paths:
+      - "src/lifelike_min/global_ablation_v9.py"
+      - "research/experiments/GLOBAL_ABLATION_V9.md"
+      - ".github/workflows/global-ablation-v9.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  ablation-pass-1:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify unchanged frozen-v9 regression suite
+        env:
+          PYTHONPATH: src
+        run: python -m unittest discover -s tests -v
+      - name: Run global structural ablation tournament
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/global-ablation-v9
+          python -m lifelike_min.global_ablation_v9 --json results/global-ablation-v9/pass1.json
+      - name: Preserve global ablation evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: global-ablation-v9-pass1
+          path: results/global-ablation-v9/pass1.json
+          if-no-files-found: error
