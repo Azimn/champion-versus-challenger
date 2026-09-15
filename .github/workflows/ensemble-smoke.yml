@@ -32,11 +32,7 @@ jobs:
         with:
           node-version: "20"
 
-      - name: Build original standalone Ensemble library
-        working-directory: external/ensemble
-        run: node build-library.js archaeology-8b74bdec
-
-      - name: Execute original Lovers and Rivals domain
+      - name: Execute shipped Lovers and Rivals domain
         run: node qualification/ensemble_smoke.js external/ensemble
 
       - name: Preserve qualification result
