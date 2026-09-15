@@ -1,13 +1,14 @@
 {
   "protocol_version": "1.0",
   "champion": null,
-  "last_experiment": "EXP-000",
+  "last_experiment": "EXP-001",
   "candidates": {
     "PC-001": {
       "name": "Ensemble",
       "classification": "RUNNABLE BASELINE",
-      "qualification_state": ["SOURCE VERIFIED", "EXECUTION PENDING"],
-      "source": "https://github.com/ensemble-engine/ensemble"
+      "qualification_state": ["SOURCE VERIFIED", "EXECUTED"],
+      "source": "https://github.com/ensemble-engine/ensemble",
+      "execution_experiment": "EXP-001"
     },
     "PC-002": {
       "name": "FAtiMA Toolkit",
