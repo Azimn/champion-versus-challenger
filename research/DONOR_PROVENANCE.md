@@ -66,11 +66,43 @@ Repositories: https://github.com/usc-psychsim/psychsim and historical https://gi
 
 Reference family: Pynadath and Marsella's PsychSim work on decision-theoretic agents with explicit models of other agents, observation-sensitive beliefs, and Theory of Mind.
 
-Role in this branch: conceptual donor for Cycle 5 social prediction. PsychSim demonstrates the value of maintaining explicit models of other actors and updating those models from observed behavior. The experimental challenger intentionally tests whether a much smaller first-order reliability estimate can obtain useful behavioral leverage before recursive Theory of Mind is justified.
+Role in this branch: conceptual donor for Cycle 5 social prediction and an upper bound for explicit uncertainty over models of other actors. PsychSim demonstrates the value of maintaining explicit models of other actors and updating those models from observed behavior. EXP-003 deliberately tests whether the existing scalar partner estimate can be repaired without importing recursive Theory of Mind.
 
 License: MIT for the open-source implementation.
 
-Reuse boundary: no PsychSim source code, domain files, reward functions, or tests are incorporated into `lifelike_min`. Cycle 5 is an independently written scalar partner model. PsychSim remains available for a later direct mechanism tournament if false-belief or recursive social-reasoning failures demonstrate that the scalar model is insufficient.
+Reuse boundary: no PsychSim source code, domain files, reward functions, or tests are incorporated into `lifelike_min`. The partner model and uncertainty policy are independently written.
+
+## Azimn/DUCK internal donor library
+
+Repository: https://github.com/Azimn/DUCK
+
+Inspected branch: `motivated-cognition-v0.10`.
+
+Relevant implementation evidence: `duck/motivated_cognition.py` contains bounded persistent motive records and multiple active motives; `duck/planning_simulation.py` exercises persistent endogenous goals, interruption, replanning, completion, and restart survival; `duck/expectations_v010.py` stores subject-owned expectations with confidence, due ticks, evidence resolution, and learned calibration.
+
+Role in EXP-003: internal conceptual donor showing that uncertainty should be represented explicitly rather than left to accidental action ordering. The expectation ledger also demonstrates the use of a prior when evidence is absent or sparse.
+
+Role in later experiments: candidate donor for bounded multiple-concern persistence and prospective commitments if those failures remain after EXP-003.
+
+License status: not established by the current archaeology pass. No DUCK source code is copied into `lifelike_min` in EXP-003. Only the behavioral concepts were used to formulate smaller independent hypotheses.
+
+## Azimn/TinyPersonaEngine internal donor library
+
+Repository: https://github.com/Azimn/TinyPersonaEngine
+
+Relevant implementation evidence: `living_entity_firstperson/models.py` contains lightweight goal sets, belief records with confidence and provenance, memory associations, attention state, and action-pressure records.
+
+Role: internal conceptual comparison point for small explicit belief and goal records without requiring a monolithic cognitive architecture.
+
+License status: no explicit project license was established in the current archaeology pass. No TinyPersonaEngine source code is copied into `lifelike_min`.
+
+## Beta Reputation System and uncertainty priors
+
+Reference: Jøsang, A., and Ismail, R. (2002). The Beta Reputation System. 15th Bled Electronic Commerce Conference.
+
+Role in EXP-003: external conceptual donor for distinguishing absence of evidence from negative evidence. Beta-family trust models use positive and negative observations together with a prior, so an unobserved actor has explicit uncertainty rather than an accidental deterministic preference.
+
+Reuse boundary: no source implementation is incorporated. EXP-003 does not implement a beta distribution. It tests the smaller hypothesis that the existing signed reliability scalar only needs an explicit conservative policy near zero evidence.
 
 ## Licensing rule
 
