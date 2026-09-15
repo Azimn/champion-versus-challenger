@@ -1,0 +1,122 @@
+{
+  "artifact_id": 10419755673,
+  "boundary_audit": {
+    "multiple_events_per_transition_supported": false,
+    "passed": true,
+    "semantic_rule": "Existing event-indexed evidence is read at event arrival, then aged/expired after event processing; the current action is recorded afterward at age zero."
+  },
+  "capacity": {
+    "minimum_preserving_earned_behavior": 2,
+    "one_record_failures": [
+      "cross_context",
+      "multiple_candidates"
+    ],
+    "selected_capacity": 2,
+    "tested": [1, 2, 3, 4]
+  },
+  "ci_run_id": 35025493280,
+  "closeout_evidence_commit": "52b3f28c0b099140b78b7a3d6a84b12e50430794",
+  "cost": {
+    "challenger": {
+      "context_event_us": {"max": 17.0376, "mean": 15.7729, "median": 15.4058, "min": 15.2482, "n": 15, "p10": 15.2482, "p90": 16.8949, "pstdev": 0.6446},
+      "exp006_reference": {"mechanism_count": 12, "median_microseconds_per_tick": 16.51, "persistent_state_bytes": 478},
+      "fresh_state_bytes": 361,
+      "idle_tick_us": {"max": 15.3083, "mean": 14.0974, "median": 13.7592, "min": 13.5713, "n": 15, "p10": 13.5713, "p90": 15.1431, "pstdev": 0.638},
+      "initialization_us": {"max": 1.6817, "mean": 1.2421, "median": 1.2209, "min": 1.2109, "n": 21, "p10": 1.212, "p90": 1.2241, "pstdev": 0.0984},
+      "max_capacity_state_bytes_runtime_scenario": 490,
+      "mechanism_count": 12,
+      "mixed_tick_us": {"max": 18.0591, "mean": 16.8648, "median": 16.4786, "min": 16.3021, "n": 15, "p10": 16.3021, "p90": 18.0523, "pstdev": 0.6722},
+      "outcome_event_us": {"max": 15.2498, "mean": 14.0189, "median": 13.6647, "min": 13.4269, "n": 15, "p10": 13.4269, "p90": 15.1816, "pstdev": 0.6632},
+      "representative_state_bytes_no_active_trace": 478,
+      "trace_payload": {"average_increment_per_record": 38.5, "increment_over_empty": 77, "records": 2, "trace_payload_bytes": 79}
+    },
+    "champion": {
+      "context_event_us": {"max": 14.6316, "mean": 13.3609, "median": 13.1045, "min": 12.9896, "n": 15, "p10": 12.9896, "p90": 14.5087, "pstdev": 0.5612},
+      "exp006_reference": {"mechanism_count": 11, "median_microseconds_per_tick": 14.8615, "persistent_state_bytes": 451},
+      "fresh_state_bytes": 334,
+      "idle_tick_us": {"max": 14.1625, "mean": 13.0799, "median": 12.7734, "min": 12.5474, "n": 15, "p10": 12.5474, "p90": 14.1286, "pstdev": 0.6375},
+      "initialization_us": {"max": 1.1023, "mean": 1.0783, "median": 1.076, "min": 1.0719, "n": 21, "p10": 1.0735, "p90": 1.0854, "pstdev": 0.0064},
+      "mechanism_count": 11,
+      "mixed_tick_us": {"max": 15.0028, "mean": 13.8388, "median": 13.5527, "min": 13.3978, "n": 15, "p10": 13.3978, "p90": 14.8915, "pstdev": 0.5552},
+      "outcome_event_us": {"max": 17.0075, "mean": 15.7672, "median": 15.4598, "min": 15.2864, "n": 15, "p10": 15.2864, "p90": 16.7334, "pstdev": 0.6193},
+      "representative_state_bytes": 451
+    },
+    "rejected_four_field_reference": {
+      "mixed_tick_median_us_observed_range": [13.5256, 19.9099],
+      "note": "Archived CI runs varied materially; use the state reduction as the reliable simplification result and treat timing differences as noisy.",
+      "persistent_state_bytes_in_comparable_exp007_representative": 553
+    }
+  },
+  "decision": "PROMOTE",
+  "experiment": "EXP-007",
+  "failures": {
+    "ablations": [],
+    "development": [],
+    "historical": [],
+    "reviewer1_raw": ["capacity_pressure_near_bound"],
+    "reviewer1_remaining_semantic": [],
+    "reviewer2": [],
+    "reviewer3": []
+  },
+  "gates": {
+    "causal_ablations": true,
+    "champion_11_mechanisms": true,
+    "champion_451_byte_reference_reproduced": true,
+    "developer_suite": true,
+    "event_boundary_semantics": true,
+    "historical_regressions": true,
+    "mechanism_count_12": true,
+    "reviewer_pass_1_semantic_claims": true,
+    "reviewer_pass_2": true,
+    "reviewer_pass_3": true,
+    "selected_capacity_is_earned_minimum": true,
+    "selected_capacity_semantics": true,
+    "subjective_access_boundary": true
+  },
+  "methodological_review": {
+    "abstention_scope": "Abstention is counted as correct only when the organism lacks enough subject-accessible evidence to choose among live causes; it is not counted as acquisition of a new capability.",
+    "context_is_not_hidden_causal_id": true,
+    "contexts_do_causal_work": "Only subject-accessible exact context is used as a retrieval cue; context is insufficient when multiple live actions share it.",
+    "contradictory_consequences_tested": true,
+    "delay_scope": "Short event buffer only: ages 0 through 10. Arbitrary long-horizon credit is not established.",
+    "evidence": "Frozen v8 loses delayed credit after interveners and can assign it to the wrong recent context-action pair.",
+    "existing_habit_mechanism_alone_sufficient": false,
+    "one_record_design_sufficient": false,
+    "one_record_failure": ["cross_context", "multiple_candidates"],
+    "positive_and_negative_updates_change_later_choice": true,
+    "reward_magnitude_binary": false,
+    "temporal_weighting_changes_behavioral_update": true,
+    "two_record_design_sufficient_for_current_earned_claims": true,
+    "unlabeled_delayed_outcome_abstains": true
+  },
+  "production_behavior_commit": "8c1e692e2b115200e3d758e481eb12576aced907",
+  "promoted_version": "v9_context_eligibility_trace",
+  "scientific_claim": {
+    "behavior_demonstrated": "The organism can retain bounded subject-accessible evidence that a recent context-action pair occurred and let a later experienced consequence influence that behavior across unrelated intervening activity when subjective context uniquely identifies one live candidate.",
+    "claims_not_established": [
+      "general causal inference",
+      "arbitrary long-horizon reinforcement learning",
+      "hidden-cause attribution",
+      "ambiguous same-context attribution",
+      "unbounded temporal credit",
+      "planning",
+      "general episodic memory"
+    ],
+    "mechanism_causally_supported": "A two-record, finite-lifetime, age-weighted context-action trace is sufficient for the tested form of context-cued delayed consequence credit."
+  },
+  "subjective_access": {
+    "hidden_causal_ids_used": false,
+    "methodological_correction": "The first final-audit attempt incorrectly placed an unlabeled outcome immediately after the action, which legitimately exercised the already-earned immediate habit rule. This corrected control inserts unrelated activity first.",
+    "passed": true,
+    "privileged_world_history_used": false,
+    "simulator_knows_but_subject_does_not": {
+      "intervening_event": "neutral/idle",
+      "learned_value": 0.0,
+      "outcome_context_available_to_subject": null,
+      "simulator_true_cause_not_passed_to_agent": {"action": "open_vent", "context": "greenhouse"}
+    },
+    "subjectively_ambiguous": {"heat": 0.0, "stir": 0.0},
+    "subjectively_unique": {"learned_value": 0.287},
+    "test_harness_metadata_used_by_agent": false
+  }
+}

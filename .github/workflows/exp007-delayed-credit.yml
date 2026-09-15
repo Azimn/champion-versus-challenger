@@ -1,0 +1,159 @@
+name: exp007-delayed-credit
+
+on:
+  push:
+    branches:
+      - exp007-delayed-credit
+    paths:
+      - "src/lifelike_min/exp007_*.py"
+      - "tests/test_exp007_delayed_credit.py"
+      - "research/experiments/EXP007_DELAYED_CREDIT.md"
+      - "research/donors/EXP007_DELAYED_CREDIT_DONORS.md"
+      - ".github/workflows/exp007-delayed-credit.yml"
+  pull_request:
+    paths:
+      - "src/lifelike_min/exp007_*.py"
+      - "tests/test_exp007_delayed_credit.py"
+      - "research/experiments/EXP007_DELAYED_CREDIT.md"
+      - "research/donors/EXP007_DELAYED_CREDIT_DONORS.md"
+      - ".github/workflows/exp007-delayed-credit.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  baseline:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Reconstruct frozen v8 and characterize delayed-credit failure
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/exp007
+          python -m lifelike_min.exp007_baseline \
+            --compact-json results/exp007/baseline-${{ matrix.python-version }}.json
+      - name: Preserve frozen baseline evidence
+        if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp007-baseline
+          path: results/exp007/baseline-3.12.json
+          if-no-files-found: error
+
+  challenger:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run EXP-007 causal and development tests
+        env:
+          PYTHONPATH: src
+        run: python -m unittest tests.test_exp007_delayed_credit -v
+      - name: Run matched EXP-007 evaluation
+        if: matrix.python-version == '3.12'
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/exp007
+          python -m lifelike_min.exp007_evaluation \
+            --json results/exp007/full.json \
+            --compact-json results/exp007/compact.json
+      - name: Preserve EXP-007 developer evidence
+        if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp007-developer-results
+          path: results/exp007
+          if-no-files-found: error
+
+  reviewer:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run post-implementation reviewer holdouts
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/exp007-review
+          python -m lifelike_min.exp007_review --json results/exp007-review/review.json
+      - name: Preserve reviewer pass 1
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp007-reviewer-pass-1
+          path: results/exp007-review/review.json
+          if-no-files-found: error
+
+  reviewer2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run second adversarial reviewer holdouts
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/exp007-review2
+          python -m lifelike_min.exp007_review2 --json results/exp007-review2/review.json
+      - name: Preserve reviewer pass 2
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp007-reviewer-pass-2
+          path: results/exp007-review2/review.json
+          if-no-files-found: error
+
+  reviewer3:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run simplification-specific holdouts
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/exp007-review3
+          python -m lifelike_min.exp007_review3 --json results/exp007-review3/review.json
+      - name: Preserve reviewer pass 3
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp007-reviewer-pass-3
+          path: results/exp007-review3/review.json
+          if-no-files-found: error
+
+  closeout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run strict EXP-007 closeout, capacity tournament, subjective-boundary audit, and cost audit
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/exp007-closeout
+          python -m lifelike_min.exp007_closeout --json results/exp007-closeout/closeout.json
+      - name: Preserve closeout evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp007-closeout
+          path: results/exp007-closeout/closeout.json
+          if-no-files-found: error

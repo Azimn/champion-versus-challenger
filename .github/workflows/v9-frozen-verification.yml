@@ -1,0 +1,39 @@
+name: v9-frozen-verification
+
+on:
+  push:
+    branches:
+      - exp007-delayed-credit
+    paths:
+      - ".github/workflows/v9-frozen-verification.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify-frozen-v9:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out frozen branch-local champion
+        uses: actions/checkout@v4
+        with:
+          ref: champion-v9-context-eligibility-trace
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run complete historical Python test suite against frozen v9
+        env:
+          PYTHONPATH: src
+        run: python -m unittest discover -s tests -v
+      - name: Re-run strict EXP-007 closeout against frozen v9
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/v9-frozen-verification
+          python -m lifelike_min.exp007_closeout --json results/v9-frozen-verification/closeout.json
+      - name: Preserve frozen-v9 verification
+        uses: actions/upload-artifact@v4
+        with:
+          name: v9-frozen-verification
+          path: results/v9-frozen-verification/closeout.json
+          if-no-files-found: error
