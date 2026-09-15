@@ -103,14 +103,46 @@ Every experiment receives a permanent record, including failures. Results must d
 **Raw trace locations:** GitHub Actions run `34990051759`; artifact `minimal-lifelike-loop-results`, artifact ID `10404648308`; permanent summary `research/results/MINIMAL_LIFELIKE_RUN_001.md`.  
 **Observed behavior:** Five consecutive challengers were promoted. v1 changed hostile-history behavior from `socialize:Alex` to `avoid:Alex` while preserving social behavior toward unrelated Blake. v2 produced temporary post-shock avoidance that decayed back to idle. v3 returned to an unfinished task after an interruption but dropped the concern after explicit cancellation. v4 learned a rewarded morning walk without applying the routine in the evening. v5 delegated to an actor observed to be reliable, verified an actor observed to be unreliable, did not transfer Alex's model to Blake, and revised Alex after contradictory evidence.  
 **Paired differences:** Behavioral-probe coverage increased monotonically from 0/5 at v0 to 5/5 at v5. Counted mechanisms increased from 3 to 8. The final report measured approximately 12.23 microseconds per tick for v0 and 15.82 microseconds per tick for v5. Representative serialized persistent state increased from 81 to 320 bytes.  
-**Regressions:** No regressions were found in previously earned targeted probes. Both Python 3.11 and 3.12 CI test jobs passed.  
+**Regressions:** No regressions were found in previously earned targeted probes under the EXP-002 battery. Both Python 3.11 and 3.12 CI test jobs passed.  
 **Artificiality attack findings:** v5 remains intentionally incomplete. Confirmed or obvious next attack surfaces include multiple simultaneous motives, prospective deadlines, false-belief persistence, differentiated forgetting, habit reversal, multi-step spontaneous activity, and richer social models beyond scalar reliability.  
 **Causal diagnosis:** Each improvement disappears in the immediately preceding champion, which functions as the ablation condition for the newly added mechanism.  
-**Ablation result:** All five added mechanisms demonstrated causal value on their targeted probe under the current battery.  
+**Ablation result:** All five added mechanisms demonstrated causal value on their targeted probe under the EXP-002 battery. EXP-003 later found that one reviewer claim about unknown-partner behavior was brittle under action reordering. The original record is preserved here rather than silently rewritten.  
 **Human-observer result, if applicable:** Not run.  
-**Decision:** promote `v5_partner_model` as the branch-local experimental champion for the next artificiality attack. Do not treat it as proof of complete lifelikeness or as the project's global Champion 0.  
+**Decision:** promote `v5_partner_model` as the branch-local experimental champion for the next artificiality attack, subject to later adversarial falsification.  
 **Reason:** The branch achieved five independently targeted longitudinal gains with one counted mechanism added per cycle, no detected regression in prior probes, preserved cognition/surface separation, and modest measured runtime/state growth.  
-**Follow-up:** Attack v5 with a discriminating false-belief or prospective-memory scenario before adding another mechanism. Compare a minimal belief-state or deadline mechanism against stronger donors such as PsychSim or BDI systems only if the failure is reproduced.
+**Follow-up:** Continue adversarial attacks before assuming each earned behavior is robust.
+
+## EXP-003: Adversarial audit and uncertainty policy correction
+
+**Date:** 2026-09-15  
+**Stage:** G through I, adversarial attack, causal diagnosis, minimal challenger, falsification, promotion  
+**Question:** Which previously untested longitudinal or adversarial condition most strongly breaks `v5_partner_model`, and can the highest-priority failure be corrected without adding a new cognitive subsystem?  
+**Target behavioral phenomenon:** Robust partner-specific prediction under uncertainty and action reordering.  
+**Champion:** Frozen `v5_partner_model` from EXP-002 commit `3faa41a7e13d4dba755b4a10baa95ce57ba169ed`.  
+**Challenger:** `v5_1_uncertainty_policy`, implemented as `UncertaintyPolicyCharacter`.  
+**Candidate systems/mechanisms:** Existing v5 scalar partner reliability generalized with an explicit uncertainty policy. Internal donors inspected first: `Azimn/DUCK` motivated cognition, planning, and expectation ledger; `Azimn/TinyPersonaEngine` lightweight beliefs, goals, attention, and action pressures. External comparison points: Beta Reputation System and PsychSim uncertainty over other-agent models.  
+**Repository refs/versions:** Branch `exp003-adversarial-audit`, PR #9. Donor boundaries are recorded in `research/DONOR_PROVENANCE.md`.  
+**Scenario IDs:** EXP-003 audit probes for multiple unfinished concerns, long-delay commitment, relationship repair, habit reversal, and partner-specific prediction; matched order-invariance target; reviewer probes for known evidence, contradictory evidence reversal, near-neutral evidence, person specificity, prior earned behavior, and renderer invariance.  
+**Seeds:** Deterministic.  
+**World-state equivalence controls:** Champion and challenger receive identical histories, action alternatives, action-order permutations, and renderer conditions.  
+**History equivalence controls:** Partner evidence histories are identical for each paired comparison.  
+**Adapter versions:** None.  
+**Hypothesis:** The persistent representation is already sufficient for the observed failure. Near-zero reliability evidence needs an explicit conservative uncertainty policy so behavior is not determined by action ordering.  
+**Predicted behavioral difference:** An unseen or near-neutral partner should be verified regardless of whether `verify` or `delegate` appears first. Strong positive evidence should still cause delegation and strong negative evidence should still cause verification.  
+**Primary measures:** Order-invariance target, preservation of all five EXP-002 target behaviors, four adversarial reviewer families, renderer invariance.  
+**Secondary measures:** Counted mechanism delta and serialized persistent-state delta.  
+**Performance measures:** Matched median microseconds per tick, mechanism count, serialized representative persistent state.  
+**Raw trace locations:** Initial frozen-champion audit run `35012684583`, artifact `10413988647`; matched challenger run `35013090805`, artifact `exp003-results`, artifact ID `10414372707`; permanent summary `research/results/EXP003_UNCERTAINTY_POLICY.md`.  
+**Observed behavior:** The initial audit found three failures: multiple concerns overwrite one another, a long-delay commitment decays away without completion or cancellation, and unknown-partner prediction was action-order dependent. Relationship repair and habit reversal passed. The social-prediction failure was prioritized because it falsified part of the EXP-002 reviewer evidence. Frozen v5 chose `verify:Blake` when verification was listed first and `delegate:Blake` when delegation was listed first. The challenger chose `verify:Blake` under both orderings. It continued to delegate to a reliably observed Alex and verify an unreliably observed Alex under both orderings. Contradictory evidence reversed Alex from delegation to verification. Near-neutral evidence remained conservative. Alex evidence did not transfer to Blake.  
+**Paired differences:** Target changed from fail to pass. All five previously earned target behaviors and renderer invariance passed. Counted mechanisms remained 8. Representative persistent state remained 325 bytes in the matched benchmark.  
+**Regressions:** None detected.  
+**Artificiality attack findings:** Two confirmed high-impact failures remain after the correction: only one unfinished concern can exist, and a future commitment can disappear solely through time-based concern decay.  
+**Causal diagnosis:** The v5 partner model represented observed reliability but assigned equal utility to delegation and verification at zero reliability. Deterministic tie-breaking therefore leaked action ordering into behavior.  
+**Ablation result:** Frozen v5 is the causal ablation. It has identical persistent partner state but lacks the uncertainty premium and fails the target.  
+**Human-observer result, if applicable:** Not run.  
+**Decision:** promote `v5_1_uncertainty_policy` as the next branch-local champion.  
+**Reason:** The challenger repairs a falsified earned behavior with no new persistent state, no new counted mechanism, no detected regression, and no runtime-cost regression. The matched CI sample measured 8.8102 microseconds per tick for v5 and 8.0190 for v5.1; this timing difference is treated as CI variance rather than a speed claim.  
+**Follow-up:** Freeze v5.1 and attack the reproduced multiple-unfinished-concerns failure with the smallest bounded concern representation. Do not import DUCK's full motive or planning architecture unless a smaller ledger fails.
 
 ## Evidence policy
 
