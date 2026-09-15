@@ -23,13 +23,14 @@ Priority scenarios:
 - B01 History Divergence, because longitudinal history dependence is central to perceived individuality.
 - B02 Social Differentiation, because partner-specific behavior is a foundational test of relationship continuity.
 - B03 Unfinished Concern, because persistent latent concerns separate continuously motivated systems from reactive state machines.
+- B05 Recovery Inertia, because an affective architecture should demonstrate that emotionally significant history persists into later behavior without either instant reset or permanent lock-in.
 - B09 False Belief and Limited Knowledge, because it directly tests epistemic boundaries and Theory of Mind.
 
-These four scenarios form the Core Discriminating Battery. They are not a replacement for the full battery. They are an early information-gain filter.
+These five scenarios form the Core Discriminating Battery. They are not a replacement for the full battery. They are an early information-gain filter chosen to sample social continuity, motivational persistence, affective persistence, and epistemic/social modeling without privileging one architectural family.
 
 ## 3. Build only thin adapters for the Core Discriminating Battery
 
-Adapters should be implemented only after the original baseline has executed. Each adapter should support the smallest mapping necessary to expose candidate behavior in B01, B02, B03, and B09.
+Adapters should be implemented only after the original baseline has executed. Each adapter should support the smallest mapping necessary to expose candidate behavior in B01, B02, B03, B05, and B09.
 
 A candidate may mark a scenario NOT EXPRESSIBLE. That result is useful evidence and must not be repaired by adding cognition to the adapter.
 
@@ -42,9 +43,9 @@ Do not select Champion 0 from an aggregate score alone. For each executed and ad
 - history sensitivity
 - social differentiation
 - unfinished concern persistence
+- affective recovery inertia
 - epistemic limitation
 - Theory of Mind
-- emotional inertia
 - motive competition
 - adaptation from consequence
 - spontaneous activity
@@ -60,7 +61,7 @@ Champion 0 should be the strongest practical whole-system starting point, not ne
 
 When a baseline performs unusually well, trace that result back to the smallest candidate mechanism before integration.
 
-For example, if PsychSim handles B09 well, determine whether the result depends on explicit nested mental models, belief update, decision horizon, or another mechanism. If Ensemble handles B01 well, determine which social-history and volition paths actually preserve the behavioral divergence.
+For example, if PsychSim handles B09 well, determine whether the result depends on explicit nested mental models, belief update, decision horizon, or another mechanism. If Ensemble handles B01 well, determine which social-history and volition paths actually preserve the behavioral divergence. If FAtiMA handles B05 well, determine whether appraisal, emotional state persistence, decision coupling, or some combination is responsible.
 
 Do not award mechanism credit from architecture diagrams or module names.
 
