@@ -12,6 +12,7 @@ class Version(str, Enum):
     AFFECT = "v2_affect"
     CONCERN = "v3_concern"
     HABIT = "v4_habit"
+    PARTNER_MODEL = "v5_partner_model"
 
 
 @dataclass(frozen=True)
@@ -53,6 +54,7 @@ class PersistentCharacter:
         self.habits: Dict[Tuple[str, str], float] = {}
         self.last_action: Optional[str] = None
         self.last_context: Optional[str] = None
+        self.partner_reliability: Dict[str, float] = {}
 
         self.trace = []
 
@@ -63,19 +65,33 @@ class PersistentCharacter:
             Version.AFFECT,
             Version.CONCERN,
             Version.HABIT,
+            Version.PARTNER_MODEL,
         }
 
     @property
     def has_affect_residue(self) -> bool:
-        return self.version in {Version.AFFECT, Version.CONCERN, Version.HABIT}
+        return self.version in {
+            Version.AFFECT,
+            Version.CONCERN,
+            Version.HABIT,
+            Version.PARTNER_MODEL,
+        }
 
     @property
     def has_concern_persistence(self) -> bool:
-        return self.version in {Version.CONCERN, Version.HABIT}
+        return self.version in {
+            Version.CONCERN,
+            Version.HABIT,
+            Version.PARTNER_MODEL,
+        }
 
     @property
     def has_habit_learning(self) -> bool:
-        return self.version is Version.HABIT
+        return self.version in {Version.HABIT, Version.PARTNER_MODEL}
+
+    @property
+    def has_partner_model(self) -> bool:
+        return self.version is Version.PARTNER_MODEL
 
     def _clamp(self, value: float, low: float = 0.0, high: float = 1.0) -> float:
         return max(low, min(high, value))
@@ -104,10 +120,23 @@ class PersistentCharacter:
                 self.active_concern = None
                 self.concern_strength = 0.0
 
+        if self.has_partner_model:
+            for actor, value in list(self.partner_reliability.items()):
+                value *= 0.999
+                if abs(value) < 0.005:
+                    del self.partner_reliability[actor]
+                else:
+                    self.partner_reliability[actor] = value
+
     def _relationship(self, actor: Optional[str]) -> float:
         if not self.has_relationship_memory or actor is None:
             return 0.0
         return self.relationships.get(actor, 0.0)
+
+    def _reliability(self, actor: Optional[str]) -> float:
+        if not self.has_partner_model or actor is None:
+            return 0.0
+        return self.partner_reliability.get(actor, 0.0)
 
     def _process_event(self, event: Event) -> tuple[float, float]:
         immediate_threat = 0.0
@@ -132,6 +161,24 @@ class PersistentCharacter:
             if self.has_affect_residue:
                 self.threat_residue = max(
                     self.threat_residue, self._clamp(0.75 * event.intensity)
+                )
+
+        elif event.kind == "observed_reliable" and event.actor:
+            if self.has_partner_model:
+                self.partner_reliability[event.actor] = self._clamp(
+                    self.partner_reliability.get(event.actor, 0.0)
+                    + 0.20 * event.intensity,
+                    -1.0,
+                    1.0,
+                )
+
+        elif event.kind == "observed_unreliable" and event.actor:
+            if self.has_partner_model:
+                self.partner_reliability[event.actor] = self._clamp(
+                    self.partner_reliability.get(event.actor, 0.0)
+                    - 0.25 * event.intensity,
+                    -1.0,
+                    1.0,
                 )
 
         elif event.kind == "shock":
@@ -207,6 +254,16 @@ class PersistentCharacter:
             if self.has_affect_residue:
                 score += 0.75 * self.threat_residue
             return score
+
+        if action.startswith("delegate:"):
+            actor = action.split(":", 1)[1]
+            reliability = self._reliability(actor)
+            return 0.10 + 0.80 * max(reliability, 0.0)
+
+        if action.startswith("verify:"):
+            actor = action.split(":", 1)[1]
+            reliability = self._reliability(actor)
+            return 0.10 + 0.80 * max(-reliability, 0.0)
 
         # Contextual routine actions have no semantic cognition in the base
         # runtime. Their only learned bias comes from the habit mechanism.
@@ -300,6 +357,11 @@ class PersistentCharacter:
             }
             state["last_action"] = self.last_action
             state["last_context"] = self.last_context
+        if self.has_partner_model:
+            state["partner_reliability"] = {
+                actor: round(value, 6)
+                for actor, value in sorted(self.partner_reliability.items())
+            }
         return state
 
     def persistent_state_bytes(self) -> int:
@@ -312,4 +374,5 @@ class PersistentCharacter:
             + int(self.has_affect_residue)
             + int(self.has_concern_persistence)
             + int(self.has_habit_learning)
+            + int(self.has_partner_model)
         )
