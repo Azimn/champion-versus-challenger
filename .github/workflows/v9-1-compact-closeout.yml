@@ -1,0 +1,45 @@
+name: v9.1-compact-closeout
+
+on:
+  push:
+    branches:
+      - global-structural-ablation-v9
+    paths:
+      - "src/lifelike_min/v9_1*.py"
+      - ".github/workflows/v9-1-compact-closeout.yml"
+      - "research/contracts/V9_1_COMPACT_EARNED_BEHAVIOR.md"
+      - "research/results/GLOBAL_ABLATION_V9_CLOSEOUT*"
+  pull_request:
+    paths:
+      - "src/lifelike_min/v9_1*.py"
+      - ".github/workflows/v9-1-compact-closeout.yml"
+      - "research/contracts/V9_1_COMPACT_EARNED_BEHAVIOR.md"
+      - "research/results/GLOBAL_ABLATION_V9_CLOSEOUT*"
+
+permissions:
+  contents: read
+
+jobs:
+  closeout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify repository regression tests
+        env:
+          PYTHONPATH: src
+        run: python -m unittest discover -s tests -v
+      - name: Run explicit v9.1 structural closeout
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/v9-1-compact-closeout
+          python -m lifelike_min.v9_1_structural_closeout --json results/v9-1-compact-closeout/closeout.json
+      - name: Preserve closeout evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: v9-1-compact-closeout
+          path: results/v9-1-compact-closeout/closeout.json
+          if-no-files-found: error
