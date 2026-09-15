@@ -15,7 +15,3 @@ cvc-validate-state = "cvc_research.cli:validate_state_main"
 
 [tool.setuptools.packages.find]
 where = ["src"]
-
-[tool.pytest.ini_options]
-pythonpath = ["src"]
-testpaths = ["tests"]
