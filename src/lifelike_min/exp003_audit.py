@@ -129,6 +129,7 @@ def unrelated_partner_specificity() -> dict:
     )
     return {
         "passed": alex == "delegate:Alex" and blake == "verify:Blake",
+        "failure_if_false": "The EXP-002 unknown-partner result depends on action ordering rather than evidence about the partner.",
         "alex_choice": alex,
         "blake_choice": blake,
         "partner_reliability": agent.snapshot().get("partner_reliability", {}),
@@ -146,11 +147,11 @@ def run_audit() -> dict:
     }
     failures = [name for name, result in probes.items() if not result["passed"]]
     impact_order = [
+        "partner_specific_prediction",
         "multiple_unfinished_concerns",
         "future_commitment_after_long_delay",
         "relationship_repair",
         "habit_reversal",
-        "partner_specific_prediction",
     ]
     selected = next((name for name in impact_order if name in failures), None)
     return {
@@ -160,7 +161,7 @@ def run_audit() -> dict:
         "probe_count": len(probes),
         "failures": failures,
         "selected_high_impact_failure": selected,
-        "selection_basis": "Prefer a failure that is longitudinal, perceptually obvious, and central to the impression that unfinished parts of a life continue to exist.",
+        "selection_basis": "First repair any adversarial failure that falsifies a behavior previously treated as earned. Only then select a new capability failure by longitudinal and perceptual impact.",
         "probes": probes,
     }
 
