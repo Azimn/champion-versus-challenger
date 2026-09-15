@@ -34,8 +34,14 @@ class EligibilityTraceCharacter(SubjectiveFactCharacter):
     def __init__(self) -> None:
         super().__init__()
         self.eligibility_records: list[EligibilityRecord] = []
+        # Transient only. If a record was live at the start of the current event but
+        # crossed its expiry boundary during this event's drift, the arriving event
+        # may still resolve it. The list is cleared on every subsequent drift and is
+        # never serialized.
+        self._expired_this_tick: list[EligibilityRecord] = []
 
     def _drift(self) -> None:
+        self._expired_this_tick = []
         super()._drift()
         survivors: list[EligibilityRecord] = []
         for row in self.eligibility_records:
@@ -46,6 +52,8 @@ class EligibilityTraceCharacter(SubjectiveFactCharacter):
                 and row.eligibility >= self.minimum_eligibility
             ):
                 survivors.append(row)
+            else:
+                self._expired_this_tick.append(row)
         self.eligibility_records = survivors
 
     def _bound_eligibility(self) -> None:
@@ -84,7 +92,9 @@ class EligibilityTraceCharacter(SubjectiveFactCharacter):
         self._bound_eligibility()
 
     def _context_candidates(self, context: str) -> list[EligibilityRecord]:
-        return [row for row in self.eligibility_records if row.context == context]
+        current = [row for row in self.eligibility_records if row.context == context]
+        boundary = [row for row in self._expired_this_tick if row.context == context]
+        return current + boundary
 
     def _apply_delayed_outcome(self, event: Event) -> bool:
         if not event.context or event.reward == 0.0:
