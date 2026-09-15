@@ -5,18 +5,20 @@ on:
     branches:
       - exp003-adversarial-audit
     paths:
-      - "src/lifelike_min/exp003_audit.py"
+      - "src/lifelike_min/exp003_*.py"
+      - "tests/test_exp003.py"
       - ".github/workflows/exp003-audit.yml"
   pull_request:
     paths:
-      - "src/lifelike_min/exp003_audit.py"
+      - "src/lifelike_min/exp003_*.py"
+      - "tests/test_exp003.py"
       - ".github/workflows/exp003-audit.yml"
 
 permissions:
   contents: read
 
 jobs:
-  audit:
+  evaluate:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -30,17 +32,31 @@ jobs:
         with:
           python-version: ${{ matrix.python-version }}
 
-      - name: Run adversarial audit
+      - name: Run frozen champion audit
         env:
           PYTHONPATH: src
         run: |
-          mkdir -p results/exp003-audit
-          python -m lifelike_min.exp003_audit --json results/exp003-audit/audit.json
+          mkdir -p results/exp003
+          python -m lifelike_min.exp003_audit --json results/exp003/audit.json
 
-      - name: Preserve audit artifact
+      - name: Run causal and reviewer tests
+        env:
+          PYTHONPATH: src
+        run: python -m unittest tests.test_exp003 -v
+
+      - name: Run matched champion challenger evaluation
+        if: matrix.python-version == '3.12'
+        env:
+          PYTHONPATH: src
+        run: |
+          python -m lifelike_min.exp003_evaluation \
+            --json results/exp003/report.json \
+            --compact-json results/exp003/report-compact.json
+
+      - name: Preserve EXP-003 evidence
         if: matrix.python-version == '3.12'
         uses: actions/upload-artifact@v4
         with:
-          name: exp003-adversarial-audit
-          path: results/exp003-audit/audit.json
+          name: exp003-results
+          path: results/exp003
           if-no-files-found: error
