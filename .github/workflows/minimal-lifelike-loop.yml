@@ -1,0 +1,60 @@
+name: minimal-lifelike-loop
+
+on:
+  push:
+    branches:
+      - minimal-lifelike-loop
+    paths:
+      - "src/lifelike_min/**"
+      - "tests/test_minimal_lifelike.py"
+      - "research/MINIMAL_LIFELIKE_LOOP.md"
+      - "research/DONOR_PROVENANCE.md"
+      - ".github/workflows/minimal-lifelike-loop.yml"
+  pull_request:
+    paths:
+      - "src/lifelike_min/**"
+      - "tests/test_minimal_lifelike.py"
+      - "research/MINIMAL_LIFELIKE_LOOP.md"
+      - "research/DONOR_PROVENANCE.md"
+      - ".github/workflows/minimal-lifelike-loop.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  evaluate:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - name: Check out branch
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Run causal and reviewer tests
+        env:
+          PYTHONPATH: src
+        run: python -m unittest tests.test_minimal_lifelike -v
+
+      - name: Run champion challenger evaluation
+        if: matrix.python-version == '3.12'
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/minimal-lifelike
+          python -m lifelike_min.evaluation \
+            --json results/minimal-lifelike/report.json \
+            --markdown results/minimal-lifelike/report.md
+
+      - name: Preserve evaluation artifacts
+        if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: minimal-lifelike-loop-results
+          path: results/minimal-lifelike
+          if-no-files-found: error
