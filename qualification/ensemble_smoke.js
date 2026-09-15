@@ -10,11 +10,19 @@ function fail(message) {
 
 const candidateRoot = path.resolve(process.argv[2] || "external/ensemble");
 const builtLibrary = path.join(candidateRoot, "build", "ensemble.js");
+const underscorePath = path.join(candidateRoot, "ensemble", "jslib", "underscore-min.js");
 const dataRoot = path.join(candidateRoot, "examples", "loversAndRivals", "data");
 
 if (!fs.existsSync(builtLibrary)) {
   fail(`Ensemble build not found: ${builtLibrary}`);
 }
+
+// ENVIRONMENT COMPATIBILITY SHIM ONLY.
+// Ensemble's standalone browser bundle expects Underscore to exist as the
+// global `_` symbol. Node loads the bundled Underscore through CommonJS, so
+// provide the same global binding before evaluating the unmodified build.
+const underscoreModule = require(underscorePath);
+global._ = underscoreModule._ || underscoreModule;
 
 require(builtLibrary);
 const api = global.ensemble;
@@ -70,6 +78,7 @@ const result = {
   execution_type: "ORIGINAL DOMAIN SMOKE",
   adapter_used: false,
   architecture_modified: false,
+  environment_compatibility_shims: ["Provide browser-global `_` in Node host"],
   cast,
   initial_action_counts: {
     hero_to_love: heroToLove.length,
