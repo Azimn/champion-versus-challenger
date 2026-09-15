@@ -46,3 +46,34 @@ jobs:
           name: exp007-baseline
           path: results/exp007/baseline-3.12.json
           if-no-files-found: error
+
+  challenger:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run EXP-007 causal and development tests
+        env:
+          PYTHONPATH: src
+        run: python -m unittest tests.test_exp007_delayed_credit -v
+      - name: Run matched EXP-007 evaluation
+        if: matrix.python-version == '3.12'
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/exp007
+          python -m lifelike_min.exp007_evaluation \
+            --json results/exp007/full.json \
+            --compact-json results/exp007/compact.json
+      - name: Preserve EXP-007 developer evidence
+        if: matrix.python-version == '3.12'
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp007-developer-results
+          path: results/exp007
+          if-no-files-found: error
