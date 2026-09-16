@@ -3,6 +3,7 @@ from __future__ import annotations
 from pathlib import Path
 from typing import Any, Iterable
 import copy
+import gzip
 import json
 
 from .model import (
@@ -239,6 +240,16 @@ def write_outputs(output_dir: Path) -> dict[str, Any]:
         json.dumps(scenario_json(), indent=2, sort_keys=True) + "\n", encoding="utf-8"
     )
     (output_dir / "RESULTS.md").write_text(results_markdown(comparison), encoding="utf-8")
+
+    global_bytes = json.dumps(global_trace, sort_keys=True, separators=(",", ":")).encode("utf-8")
+    differential_bytes = json.dumps(
+        differential_trace, sort_keys=True, separators=(",", ":")
+    ).encode("utf-8")
+    (output_dir / "trace_global.json.gz").write_bytes(gzip.compress(global_bytes, mtime=0))
+    (output_dir / "trace_differential.json.gz").write_bytes(
+        gzip.compress(differential_bytes, mtime=0)
+    )
+
     _write_trace_parts(output_dir / "global", global_trace)
     _write_trace_parts(output_dir / "differential", differential_trace)
     return comparison
