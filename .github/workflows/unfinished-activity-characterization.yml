@@ -1,0 +1,39 @@
+name: unfinished-activity-characterization
+
+on:
+  push:
+    branches:
+      - post-exp008-failure-revalidation
+    paths:
+      - "src/lifelike_min/failure_characterization_unfinished.py"
+      - ".github/workflows/unfinished-activity-characterization.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  characterize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify frozen champion production unchanged
+        run: |
+          git diff --exit-code 2856ec6a32be0347a9243f6eff6faa404a9a0e6c -- src/lifelike_min/v9_1_compact.py src/lifelike_min/v9_compact.py src/lifelike_min/exp004_challenger.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run causal characterization
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/unfinished-characterization
+          python -m lifelike_min.failure_characterization_unfinished --json results/unfinished-characterization/result.json
+      - name: Preserve characterization
+        uses: actions/upload-artifact@v4
+        with:
+          name: unfinished-activity-characterization
+          path: results/unfinished-characterization/result.json
+          if-no-files-found: error
