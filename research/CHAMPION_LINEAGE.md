@@ -37,7 +37,8 @@ This lineage records the experimentally promoted sequence used by the minimal no
 | `v7_prospective_cue` | EXP-005 | Latent future commitment reactivated by an experienced environmental cue | 10 | EXP-005 record | Historical |
 | `v8_subjective_fact` | EXP-006 | Subject-owned factual belief kept distinct from hidden world state | 11 | EXP-006 record | Superseded by v9 |
 | `v9_context_eligibility_trace` | EXP-007 | Bounded context-cued delayed consequence credit across intervening activity | 12 | production behavior `8c1e692e2b115200e3d758e481eb12576aced907`; branch `champion-v9-context-eligibility-trace`; closeout run `35025493280` | Frozen behavioral ancestor |
-| `v9.1_compact` | Global structural ablation | No new behavior; removes redundant concern compatibility state, duplicate last-action state, dead idle-habit storage, and unearned store capacity | 11 | closeout run `35051162103`; artifact `10428882688`; freeze branch recorded after closeout | Current branch-local structural champion |
+| `v9.1_compact` | Global structural ablation | No new behavior; removes redundant concern compatibility state, duplicate last-action state, dead idle-habit storage, and unearned store capacity | 11 | closeout run `35051162103`; artifact `10428882688`; branch `champion-v9-1-compact`; commit `2856ec6a32be0347a9243f6eff6faa404a9a0e6c` | Superseded by v9.2 |
+| `v9.2_unresolved_concern_persistence` | EXP-009 | Separates unresolved concern membership from momentary activation by removing decay-threshold deletion while preserving cancellation, work resolution, and capacity-two eviction | 11 | production file frozen since `b5cc3e109ab2fa4de0421dc113009d1ee7fb050d`; final closeout run `35138150402`; artifact `10464196939`; champion branch recorded after closeout | Current branch-local behavioral champion |
 
 ### v9 freeze note
 
@@ -46,6 +47,12 @@ The final EXP-007 organism stores at most two eligibility records. Each contains
 ### v9.1 structural note
 
 Global structural ablation re-litigated accumulated mechanisms rather than adding a capability. The promoted compact descendant stores no `active_concern`, `concern_strength`, `last_action`, or `last_context` fields; concern and prospective stores are each bounded at two; eligibility remains bounded at two. The first structural closeout (`35028834468`) rejected the candidate because the inherited rounded diagnostic snapshot was not lossless across reconstruction. The corrected full-precision persistence representation passed the complete closeout in run `35051162103` without changing behavioral policy. Full evidence is preserved in `research/results/GLOBAL_ABLATION_V9_CLOSEOUT.md` and `.json`.
+
+### v9.2 EXP-009 note
+
+EXP-009 changed no persistent schema and added no counted mechanism. The bounded concern dictionary key/membership now carries the narrow experimentally supported meaning that the named concern remains unresolved, while its existing scalar remains current activation. Ordinary drift still multiplies activation by 0.97 but no longer deletes the concern solely for crossing the old 0.08 threshold. Explicit cancellation, existing work-mediated resolution, and capacity-two eviction remain deletion paths.
+
+Reviewer generation 1 produced one preserved exact-floating-point assertion failure, adjudicated as numerically invalid without production changes. Reviewer generation 2 passed 12/12. The first strict closeout was preserved as a harness rejection because it incorrectly required a concern to survive a later legitimate work-resolution event. Corrected closeout run `35138150402` passed the complete historical contract and promoted the candidate. `suppressed_concern_never_returns` remains unresolved because EXP-009 does not retain capacity-evicted concerns. Full evidence is preserved in `research/results/EXP009_UNFINISHED_CONCERN_PERSISTENCE_FINAL.md` and `.json`.
 
 ## Freeze rule
 
