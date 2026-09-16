@@ -1,0 +1,49 @@
+name: v9-2-freeze-verification
+
+on:
+  push:
+    branches:
+      - exp009-unfinished-concern-persistence
+    paths:
+      - ".github/workflows/v9-2-freeze-verification.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out frozen champion branch independently
+        uses: actions/checkout@v4
+        with:
+          ref: champion-v9-2-unresolved-concern-persistence
+          fetch-depth: 0
+      - name: Verify exact frozen champion commit
+        run: test "$(git rev-parse HEAD)" = "bd1ca22ca58e82012f1a8237e3de4bfee4dbf59d"
+      - name: Verify evaluated production file is identical
+        run: git diff --exit-code b5cc3e109ab2fa4de0421dc113009d1ee7fb050d -- src/lifelike_min/exp009_challenger.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run full repository tests from frozen champion
+        env:
+          PYTHONPATH: src
+        run: python -m unittest discover -s tests -v
+      - name: Re-run explicit strict closeout from frozen champion
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/v9-2-freeze
+          python -m lifelike_min.exp009_closeout_v2 --json results/v9-2-freeze/closeout.json
+      - name: Revalidate original longitudinal failure reproductions
+        env:
+          PYTHONPATH: src
+        run: python -m lifelike_min.post_exp009_failure_revalidation --json results/v9-2-freeze/failure-queue.json
+      - name: Preserve freeze and queue evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: v9-2-freeze-verification
+          path: results/v9-2-freeze
+          if-no-files-found: error
