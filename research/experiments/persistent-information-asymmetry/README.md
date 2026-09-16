@@ -22,7 +22,7 @@ python -m cvc_research.experiments.information_asymmetry \
 python -m unittest discover -s tests -p 'test_information_asymmetry.py' -v
 ```
 
-The generated artifacts are deterministic. Each condition is stored as a manifest plus one JSON file per timestep, so a reviewer can inspect processor-local state and message routing without opening a large monolithic trace. Re-running the experiment should reproduce the committed files byte for byte.
+The generated artifacts are deterministic. Each condition is emitted as a manifest plus one JSON file per timestep for direct audit. The same complete runs are also written as deterministic `trace_global.json.gz` and `trace_differential.json.gz` snapshots for compact storage. Re-running the experiment should reproduce the committed trace snapshots byte for byte.
 
 ## Researcher instrumentation boundary
 
