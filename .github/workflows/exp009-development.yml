@@ -1,0 +1,54 @@
+name: exp009-development
+
+on:
+  push:
+    branches:
+      - exp009-unfinished-concern-persistence
+    paths:
+      - "src/lifelike_min/exp009_*.py"
+      - "tests/test_exp009.py"
+      - ".github/workflows/exp009-development.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  development:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.11", "3.12"]
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify frozen v9.1 production is unchanged
+        run: |
+          git diff --exit-code 2856ec6a32be0347a9243f6eff6faa404a9a0e6c -- \
+            src/lifelike_min/v9_1_compact.py \
+            src/lifelike_min/v9_compact.py \
+            src/lifelike_min/exp004_challenger.py \
+            src/lifelike_min/exp005_challenger.py \
+            src/lifelike_min/exp006_challenger.py \
+            src/lifelike_min/exp007_challenger.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Run full repository test suite
+        env:
+          PYTHONPATH: src
+        run: python -m unittest discover -s tests -v
+      - name: Run EXP-009 matched evaluation
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/exp009-development/${{ matrix.python-version }}
+          python -m lifelike_min.exp009_evaluation --json results/exp009-development/${{ matrix.python-version }}/evaluation.json
+      - name: Preserve development evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp009-development-${{ matrix.python-version }}
+          path: results/exp009-development/${{ matrix.python-version }}
+          if-no-files-found: warn
