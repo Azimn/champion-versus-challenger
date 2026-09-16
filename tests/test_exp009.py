@@ -1,6 +1,6 @@
 import unittest
 
-from lifelike_min.exp009_evaluation import run
+from lifelike_min.exp009_evaluation_v2 import run
 
 
 class Exp009DevelopmentTests(unittest.TestCase):
