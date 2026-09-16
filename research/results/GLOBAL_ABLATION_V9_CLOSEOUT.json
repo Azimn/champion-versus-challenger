@@ -1,0 +1,100 @@
+{
+  "phase": "GLOBAL_STRUCTURAL_ABLATION_V9",
+  "decision": "PROMOTE",
+  "structural_version": "v9.1_compact",
+  "behavioral_ancestor": "v9_context_eligibility_trace",
+  "behavioral_ancestor_commit": "8c1e692e2b115200e3d758e481eb12576aced907",
+  "behavioral_claim_change": "NONE",
+  "completed_pairwise_capacity_evidence": {
+    "workflow_run": 35027204622,
+    "artifact_id": 10419708926,
+    "files": ["pairwise-consolidation.json", "capacity-tournament.json"]
+  },
+  "first_closeout": {
+    "workflow_run": 35028834468,
+    "decision": "REJECT",
+    "reason": "rounded diagnostic snapshot was not a lossless persistence representation",
+    "behavioral_regression": false
+  },
+  "corrected_closeout": {
+    "workflow_run": 35051162103,
+    "artifact_id": 10428882688,
+    "decision": "PROMOTE",
+    "all_gates_passed": true
+  },
+  "accepted_reductions": {
+    "active_concern": "derived from concern ledger; not stored",
+    "concern_strength": "derived from concern ledger; not stored",
+    "last_action": "removed",
+    "last_context": "removed",
+    "immediate_credit_source": "age-zero context-action eligibility record",
+    "dead_context_idle_habit_storage": "removed",
+    "concern_capacity": 2,
+    "prospective_capacity": 2,
+    "eligibility_capacity": 2
+  },
+  "rejected_consolidations": {
+    "active_concern_plus_prospective": "representationally invalid; same named concern can be active and latent simultaneously",
+    "reliability_plus_location_belief": "representationally invalid; one entity can simultaneously possess independent reliability and location beliefs",
+    "affect_generic_temporal_record": "larger than the existing single scalar and semantically unnecessary",
+    "habit_shared_update_helper": "source-code refactoring only; removes no organism state"
+  },
+  "mechanism_reclassification": {
+    "frozen_v9": 12,
+    "v9_1_compact": 11,
+    "uncertainty_policy_counted_as_independent_persistent_mechanism": false
+  },
+  "state_audit": {
+    "frozen_v9": {
+      "fresh_serialized_bytes": 361,
+      "representative_serialized_bytes": 607,
+      "maximum_bounded_store_scenario_bytes": 649,
+      "concern_capacity": 3,
+      "prospective_capacity": 3,
+      "eligibility_capacity": 2
+    },
+    "v9_1_compact": {
+      "fresh_serialized_bytes": 269,
+      "representative_serialized_bytes": 577,
+      "maximum_bounded_store_scenario_bytes": 577,
+      "concern_capacity": 2,
+      "prospective_capacity": 2,
+      "eligibility_capacity": 2
+    },
+    "fresh_reduction_bytes": 92,
+    "fresh_reduction_percent": 25.48,
+    "representative_reduction_bytes": 30,
+    "representative_reduction_percent": 4.94,
+    "maximum_bounded_store_reduction_bytes": 72,
+    "timing_claim": "NO_STABLE_SPEED_CLAIM"
+  },
+  "persistence": {
+    "canonical_payload": "full-precision mutable organism state",
+    "diagnostic_snapshot": "rounded and non-authoritative for restore",
+    "restore_continuity": true,
+    "serialized_test_payload_bytes": 510,
+    "debug_trace_serialized": false,
+    "frozen_class_configuration_serialized": false
+  },
+  "gates": {
+    "explicit_earned_behavior_manifest": true,
+    "structural_adversarial_review": true,
+    "persistent_inventory_clean": true,
+    "mechanism_reclassification": true,
+    "reverse_ablations": true,
+    "serialization_reconstruction": true,
+    "second_order_structural_review": true,
+    "state_reduced": true,
+    "mechanism_count_reduced": true
+  },
+  "claims_not_changed": [
+    "EXP-007 remains bounded context-cued delayed consequence credit using subject-accessible evidence",
+    "no general causal inference",
+    "no hidden-cause attribution",
+    "no arbitrary long-horizon reinforcement learning",
+    "no ambiguous same-context attribution",
+    "no planning",
+    "no unbounded temporal credit",
+    "no general episodic memory"
+  ]
+}
