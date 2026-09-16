@@ -107,17 +107,23 @@ class PersistentInformationAsymmetryTests(unittest.TestCase):
             second = Path(temp_dir) / "second"
             write_outputs(first)
             write_outputs(second)
-            names = {
-                "scenario.json",
-                "trace_global.json",
-                "trace_differential.json",
-                "RESULTS.md",
-            }
-            self.assertEqual({path.name for path in first.iterdir()}, names)
-            for name in names:
-                self.assertEqual((first / name).read_bytes(), (second / name).read_bytes())
-            json.loads((first / "trace_global.json").read_text())
-            json.loads((first / "trace_differential.json").read_text())
+            first_files = sorted(
+                path.relative_to(first) for path in first.rglob("*") if path.is_file()
+            )
+            second_files = sorted(
+                path.relative_to(second) for path in second.rglob("*") if path.is_file()
+            )
+            self.assertEqual(first_files, second_files)
+            self.assertIn(Path("scenario.json"), first_files)
+            self.assertIn(Path("RESULTS.md"), first_files)
+            self.assertIn(Path("global/manifest.json"), first_files)
+            self.assertIn(Path("differential/manifest.json"), first_files)
+            self.assertIn(Path("global/t07.json"), first_files)
+            self.assertIn(Path("differential/t07.json"), first_files)
+            for relative in first_files:
+                self.assertEqual((first / relative).read_bytes(), (second / relative).read_bytes())
+            json.loads((first / "global/t04.json").read_text())
+            json.loads((first / "differential/t04.json").read_text())
 
 
 if __name__ == "__main__":
