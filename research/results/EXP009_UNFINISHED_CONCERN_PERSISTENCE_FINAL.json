@@ -1,0 +1,64 @@
+{
+  "experiment": "EXP-009",
+  "decision": "PROMOTE",
+  "promoted_version": "v9.2_unresolved_concern_persistence",
+  "frozen_ancestor": {
+    "version": "v9.1_compact",
+    "commit": "2856ec6a32be0347a9243f6eff6faa404a9a0e6c"
+  },
+  "production": {
+    "path": "src/lifelike_min/exp009_challenger.py",
+    "frozen_since_commit": "b5cc3e109ab2fa4de0421dc113009d1ee7fb050d",
+    "new_persistent_fields": 0,
+    "new_counted_mechanisms": 0,
+    "mechanism_count": 11,
+    "concern_capacity": 2,
+    "prospective_capacity": 2,
+    "eligibility_capacity": 2
+  },
+  "evidence": {
+    "baseline_run": 35136596111,
+    "baseline_artifact": 10462174834,
+    "failed_development_run": 35136991980,
+    "corrected_development_run": 35137210760,
+    "reviewer1_raw_run": 35137413998,
+    "reviewer1_raw_artifact": 10463856104,
+    "reviewer1_raw_result": "14/15; sole failure classified numerical artifact due exact binary-float equality assertion",
+    "reviewer1_adjudication_run": 35137685770,
+    "reviewer2_run": 35137803066,
+    "reviewer2_artifact": 10463767721,
+    "reviewer2_result": "12/12",
+    "failed_closeout_run": 35137960593,
+    "failed_closeout_artifact": 10463248914,
+    "failed_closeout_classification": "invalid reconstruction assertion prohibited later legitimate work-mediated resolution",
+    "final_closeout_run": 35138150402,
+    "final_closeout_artifact": 10464196939
+  },
+  "state_cost": {
+    "fresh_diagnostic_bytes": 269,
+    "fresh_canonical_bytes": 245,
+    "representative_diagnostic_bytes": 577,
+    "representative_canonical_bytes": 533,
+    "maximum_bounded_diagnostic_bytes": 577,
+    "maximum_bounded_canonical_bytes": 533,
+    "after_1000_unrelated_canonical_bytes": 279,
+    "after_1000_unrelated_diagnostic_bytes": 304,
+    "ancestor_after_1000_unrelated_canonical_bytes": 245,
+    "ancestor_after_1000_unrelated_diagnostic_bytes": 269,
+    "lifetime_occupancy_delta_canonical_bytes": 34,
+    "lifetime_occupancy_delta_diagnostic_bytes": 35
+  },
+  "behavior_demonstrated": "An explicitly unfinished concern remains represented through unrelated time while its existing activation scalar decays, and existing cancellation, work-mediated resolution, reassignment, and bounded replacement remain effective.",
+  "causal_semantic_distinction_supported": "Restoring only decay-threshold deletion restores the original evaporation failure, while disabling activation decay separately freezes strength. Membership and activation therefore make separable behavioral contributions using the existing state representation.",
+  "suppressed_concern_never_returns": "unchanged",
+  "claims_not_established": [
+    "general intention theory",
+    "human-like motivation",
+    "planning",
+    "general goal persistence",
+    "general forgetting",
+    "BDI semantics",
+    "long-term memory",
+    "return of capacity-evicted concerns"
+  ]
+}
