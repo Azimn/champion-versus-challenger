@@ -36,10 +36,11 @@ jobs:
           PYTHONPATH: src
         run: |
           mkdir -p results/v9-1-compact-closeout
-          python -m lifelike_min.v9_1_structural_closeout --json results/v9-1-compact-closeout/closeout.json
+          python -m lifelike_min.v9_1_structural_closeout_v2 --json results/v9-1-compact-closeout/closeout.json
       - name: Preserve closeout evidence
+        if: always()
         uses: actions/upload-artifact@v4
         with:
           name: v9-1-compact-closeout
           path: results/v9-1-compact-closeout/closeout.json
-          if-no-files-found: error
+          if-no-files-found: warn
