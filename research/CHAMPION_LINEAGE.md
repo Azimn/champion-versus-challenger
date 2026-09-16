@@ -36,11 +36,16 @@ This lineage records the experimentally promoted sequence used by the minimal no
 | `v6_bounded_concern_ledger` | EXP-004 | Multiple bounded simultaneous unfinished concerns | 9 | EXP-004 record | Historical |
 | `v7_prospective_cue` | EXP-005 | Latent future commitment reactivated by an experienced environmental cue | 10 | EXP-005 record | Historical |
 | `v8_subjective_fact` | EXP-006 | Subject-owned factual belief kept distinct from hidden world state | 11 | EXP-006 record | Superseded by v9 |
-| `v9_context_eligibility_trace` | EXP-007 | Bounded context-cued delayed consequence credit across intervening activity | 12 | production behavior `8c1e692e2b115200e3d758e481eb12576aced907`; closeout run `35025493280` | Current branch-local champion |
+| `v9_context_eligibility_trace` | EXP-007 | Bounded context-cued delayed consequence credit across intervening activity | 12 | production behavior `8c1e692e2b115200e3d758e481eb12576aced907`; branch `champion-v9-context-eligibility-trace`; closeout run `35025493280` | Frozen behavioral ancestor |
+| `v9.1_compact` | Global structural ablation | No new behavior; removes redundant concern compatibility state, duplicate last-action state, dead idle-habit storage, and unearned store capacity | 11 | closeout run `35051162103`; artifact `10428882688`; freeze branch recorded after closeout | Current branch-local structural champion |
 
 ### v9 freeze note
 
 The final EXP-007 organism stores at most two eligibility records. Each contains only `context`, `action`, and `age`. Eligibility is derived from age. Capacity one failed already-earned cross-context and multiple-candidate behavior; capacities two through four preserved the current earned suite, so two was selected as the smallest supported bound. The detailed trajectory and cost evidence are preserved in `research/results/EXP007_DELAYED_CREDIT_FINAL.md` and `.json`.
+
+### v9.1 structural note
+
+Global structural ablation re-litigated accumulated mechanisms rather than adding a capability. The promoted compact descendant stores no `active_concern`, `concern_strength`, `last_action`, or `last_context` fields; concern and prospective stores are each bounded at two; eligibility remains bounded at two. The first structural closeout (`35028834468`) rejected the candidate because the inherited rounded diagnostic snapshot was not lossless across reconstruction. The corrected full-precision persistence representation passed the complete closeout in run `35051162103` without changing behavioral policy. Full evidence is preserved in `research/results/GLOBAL_ABLATION_V9_CLOSEOUT.md` and `.json`.
 
 ## Freeze rule
 
