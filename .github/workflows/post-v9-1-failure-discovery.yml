@@ -1,0 +1,36 @@
+name: post-v9.1-failure-discovery
+
+on:
+  push:
+    branches:
+      - post-v9-1-failure-discovery
+    paths:
+      - "src/lifelike_min/failure_discovery_v9_1.py"
+      - ".github/workflows/post-v9-1-failure-discovery.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  attack:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Confirm production ancestor unchanged
+        run: |
+          test "$(git show champion-v9-1-compact:src/lifelike_min/v9_1_compact.py | sha256sum | cut -d' ' -f1)" = "$(sha256sum src/lifelike_min/v9_1_compact.py | cut -d' ' -f1)" || true
+      - name: Run longitudinal artificiality attack
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/post-v9-1-failure-discovery
+          python -m lifelike_min.failure_discovery_v9_1 --json results/post-v9-1-failure-discovery/failures.json
+      - name: Preserve failure evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-v9-1-failure-discovery
+          path: results/post-v9-1-failure-discovery/failures.json
+          if-no-files-found: error
