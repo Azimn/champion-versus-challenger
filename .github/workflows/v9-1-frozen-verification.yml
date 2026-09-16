@@ -1,0 +1,41 @@
+name: v9.1-frozen-verification
+
+on:
+  push:
+    branches:
+      - global-structural-ablation-v9
+    paths:
+      - ".github/workflows/v9-1-frozen-verification.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  verify-frozen-ref:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: champion-v9-1-compact
+      - name: Confirm frozen commit
+        run: |
+          test "$(git rev-parse HEAD)" = "2856ec6a32be0347a9243f6eff6faa404a9a0e6c"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify repository regression tests from frozen ref
+        env:
+          PYTHONPATH: src
+        run: python -m unittest discover -s tests -v
+      - name: Verify explicit earned contract and structural closeout from frozen ref
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/v9-1-frozen-verification
+          python -m lifelike_min.v9_1_structural_closeout_v2 --json results/v9-1-frozen-verification/verification.json
+      - name: Preserve frozen verification evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: v9-1-frozen-verification
+          path: results/v9-1-frozen-verification/verification.json
+          if-no-files-found: error
