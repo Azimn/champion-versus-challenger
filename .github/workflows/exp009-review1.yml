@@ -1,0 +1,39 @@
+name: exp009-review1
+
+on:
+  push:
+    branches:
+      - exp009-unfinished-concern-persistence
+    paths:
+      - "src/lifelike_min/exp009_review1.py"
+      - ".github/workflows/exp009-review1.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  review1:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify frozen EXP-009 production implementation
+        run: git diff --exit-code b5cc3e109ab2fa4de0421dc113009d1ee7fb050d -- src/lifelike_min/exp009_challenger.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run reviewer generation 1 unchanged
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/exp009-review1
+          python -m lifelike_min.exp009_review1 --json results/exp009-review1/review1.json
+      - name: Preserve reviewer evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp009-review1
+          path: results/exp009-review1
+          if-no-files-found: warn
