@@ -1,0 +1,46 @@
+name: exp008-search-experience
+
+on:
+  push:
+    branches:
+      - exp008-search-experience-policy
+    paths:
+      - "src/lifelike_min/exp008_*.py"
+      - "research/experiments/EXP008_FAILED_SEARCH_ADAPTATION.md"
+      - "research/donors/EXP008_FAILED_SEARCH_DONORS.md"
+      - ".github/workflows/exp008-search-experience.yml"
+  pull_request:
+    paths:
+      - "src/lifelike_min/exp008_*.py"
+      - "research/experiments/EXP008_FAILED_SEARCH_ADAPTATION.md"
+      - "research/donors/EXP008_FAILED_SEARCH_DONORS.md"
+      - ".github/workflows/exp008-search-experience.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  development:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Verify repository regression tests
+        env:
+          PYTHONPATH: src
+        run: python -m unittest discover -s tests -v
+      - name: Run EXP-008 matched development and ablation suite
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/exp008
+          python -m lifelike_min.exp008_evaluation --json results/exp008/development.json
+      - name: Preserve EXP-008 development evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp008-development
+          path: results/exp008/development.json
+          if-no-files-found: warn
