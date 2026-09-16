@@ -15,6 +15,11 @@ class SearchExperiencePolicyCharacter(V91CompactCharacter):
     search-task context. Search action/outcome history is stored in the already
     existing habit table and bounded eligibility trace. No factual location belief
     is revised from reward alone.
+
+    A later direct observation is stronger, newer evidence than stale negative
+    search experience about that same entity/location. It therefore invalidates
+    only matching negative search-experience entries without adding confidence or
+    observation-timestamp state.
     """
 
     @staticmethod
@@ -27,6 +32,26 @@ class SearchExperiencePolicyCharacter(V91CompactCharacter):
         task = quote(str(event.context), safe="")
         actor = quote(str(event.actor), safe="")
         return f"search_task:{task};entity:{actor}"
+
+    @staticmethod
+    def _encoded_actor_suffix(actor: str) -> str:
+        return f";entity:{quote(str(actor), safe='')}"
+
+    def _invalidate_negative_search_experience_for_observation(
+        self, actor: str, location: str
+    ) -> None:
+        suffix = self._encoded_actor_suffix(actor)
+        search_action = f"search:{location}"
+        stale_keys = [
+            key
+            for key, value in self.habits.items()
+            if value < 0.0
+            and key[1] == search_action
+            and key[0].startswith("search_task:")
+            and key[0].endswith(suffix)
+        ]
+        for key in stale_keys:
+            del self.habits[key]
 
     def _score_action(
         self,
@@ -79,6 +104,14 @@ class SearchExperiencePolicyCharacter(V91CompactCharacter):
         )
         self.habits[key] = self._clamp(updated, -1.0, 1.0)
         return True
+
+    def _process_event(self, event: Event) -> tuple[float, float]:
+        result = super()._process_event(event)
+        if event.kind == "observe_location" and event.actor and event.context:
+            self._invalidate_negative_search_experience_for_observation(
+                str(event.actor), str(event.context)
+            )
+        return result
 
     def _apply_action_effects(self, action: str, event: Event) -> None:
         experience_context = (
