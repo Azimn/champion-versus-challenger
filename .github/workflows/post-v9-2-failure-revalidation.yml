@@ -1,0 +1,44 @@
+name: post-v9-2-failure-revalidation
+
+on:
+  push:
+    branches:
+      - exp009-unfinished-concern-persistence
+    paths:
+      - ".github/workflows/post-v9-2-failure-revalidation.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  revalidate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Check out post-v9.2 audit branch
+        uses: actions/checkout@v4
+        with:
+          ref: post-v9-2-failure-revalidation
+          fetch-depth: 0
+      - name: Verify audit branch root and production identity
+        run: |
+          test "$(git rev-parse HEAD)" = "8c03d5a2fcd72b255a15a9287dd48ad0aa716746"
+          git diff --exit-code b5cc3e109ab2fa4de0421dc113009d1ee7fb050d -- src/lifelike_min/exp009_challenger.py
+      - name: Verify original failure-discovery blob is exact
+        run: test "$(git hash-object src/lifelike_min/failure_discovery_v9_1.py)" = "e153ad052e7033f802ed3b85d9781df31a48761b"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Revalidate unchanged original failure reproductions
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/post-v9-2
+          python -m lifelike_min.post_exp009_failure_revalidation --json results/post-v9-2/failure-queue.json
+      - name: Preserve queue evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: post-v9-2-failure-revalidation
+          path: results/post-v9-2
+          if-no-files-found: warn
