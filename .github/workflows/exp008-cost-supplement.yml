@@ -1,0 +1,38 @@
+name: exp008-cost-supplement
+
+on:
+  push:
+    branches:
+      - exp008-search-experience-policy
+    paths:
+      - "src/lifelike_min/exp008_cost_supplement.py"
+      - ".github/workflows/exp008-cost-supplement.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  cost:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify EXP-008 production remains frozen
+        run: git diff --exit-code c42a43d353b21061b97cabb665e8ef59544d27c9 -- src/lifelike_min/exp008_challenger.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Measure normalized representational and runtime costs
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/exp008-cost
+          python -m lifelike_min.exp008_cost_supplement --json results/exp008-cost/cost.json
+      - name: Preserve cost evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp008-cost-supplement
+          path: results/exp008-cost/cost.json
+          if-no-files-found: error
