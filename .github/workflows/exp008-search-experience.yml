@@ -8,12 +8,14 @@ on:
       - "src/lifelike_min/exp008_*.py"
       - "research/experiments/EXP008_FAILED_SEARCH_ADAPTATION.md"
       - "research/donors/EXP008_FAILED_SEARCH_DONORS.md"
+      - "research/reviews/EXP008_DEVELOPMENT_PASS1.md"
       - ".github/workflows/exp008-search-experience.yml"
   pull_request:
     paths:
       - "src/lifelike_min/exp008_*.py"
       - "research/experiments/EXP008_FAILED_SEARCH_ADAPTATION.md"
       - "research/donors/EXP008_FAILED_SEARCH_DONORS.md"
+      - "research/reviews/EXP008_DEVELOPMENT_PASS1.md"
       - ".github/workflows/exp008-search-experience.yml"
 
 permissions:
@@ -31,16 +33,16 @@ jobs:
         env:
           PYTHONPATH: src
         run: python -m unittest discover -s tests -v
-      - name: Run EXP-008 matched development and ablation suite
+      - name: Run corrected EXP-008 matched development and ablation suite
         env:
           PYTHONPATH: src
         run: |
           mkdir -p results/exp008
-          python -m lifelike_min.exp008_evaluation --json results/exp008/development.json
+          python -m lifelike_min.exp008_evaluation_v2 --json results/exp008/development.json
       - name: Preserve EXP-008 development evidence
         if: always()
         uses: actions/upload-artifact@v4
         with:
-          name: exp008-development
+          name: exp008-development-v2
           path: results/exp008/development.json
           if-no-files-found: warn
