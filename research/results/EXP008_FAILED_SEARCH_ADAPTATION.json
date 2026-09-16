@@ -1,0 +1,57 @@
+{
+  "experiment": "EXP-008",
+  "decision": "REJECT",
+  "champion_retained": {
+    "version": "v9.1_compact",
+    "branch": "champion-v9-1-compact",
+    "commit": "2856ec6a32be0347a9243f6eff6faa404a9a0e6c",
+    "mechanism_count": 11,
+    "fresh_diagnostic_state_bytes": 269,
+    "representative_diagnostic_state_bytes": 577,
+    "maximum_bounded_diagnostic_state_bytes": 577
+  },
+  "candidate": {
+    "production_commit": "c42a43d353b21061b97cabb665e8ef59544d27c9",
+    "new_persistent_field_categories": 0,
+    "mechanism_count": 11,
+    "promoted": false
+  },
+  "reviewer2": {
+    "run": 35061378333,
+    "artifact": 10432691986,
+    "raw_passes": 9,
+    "raw_failures": ["matching_negative_only"],
+    "failure_classification": "invalid reviewer assumption under EXP-007 same-context ambiguity abstention"
+  },
+  "closeout": {
+    "run": 35061913740,
+    "artifact": 10432841218,
+    "mechanical_gates_passed": true,
+    "semantic_gate_passed": false
+  },
+  "cost": {
+    "run": 35062110019,
+    "artifact": 10432713139,
+    "fresh_diagnostic_state_bytes": {"v9_1_compact": 269, "exp008": 269},
+    "representative_diagnostic_state_bytes": {"v9_1_compact": 577, "exp008": 577},
+    "fresh_canonical_persistence_bytes": {"v9_1_compact": 245, "exp008": 245},
+    "representative_canonical_persistence_bytes": {"v9_1_compact": 533, "exp008": 533},
+    "normalized_search_history_128_canonical_bytes": {"v9_1_compact": 4468, "exp008": 8052},
+    "incremental_qualified_key_overhead_bytes_per_entry_at_128": 28.0
+  },
+  "causal_findings": {
+    "original_repeated_failure": "qualified learned search value in action scoring is causal",
+    "fresh_same_location_reobservation": "observation-triggered invalidation is causal for the reviewer-1 correction",
+    "entity_task_qualification": "causal for avoiding tested contamination"
+  },
+  "rejection_reason": "The existing habits scalar is a generic reward-shaped action value. The runtime cannot distinguish failed-to-locate evidence contradicted by direct observation from still-valid non-epistemic negative action utility. Deleting every matching negative search value therefore exceeds the semantics represented by the state.",
+  "claims_not_established": [
+    "general belief revision",
+    "general epistemic reasoning",
+    "general utility reconciliation",
+    "causal inference",
+    "memory consolidation",
+    "typed distinction between search failure and search cost",
+    "improved human-perceived lifelikeness"
+  ]
+}
