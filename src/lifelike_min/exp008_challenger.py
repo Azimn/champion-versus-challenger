@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from urllib.parse import quote
+
 from .exp007_challenger import EligibilityTraceCharacter
 from .runtime import Event
 from .v9_1_compact import V91CompactCharacter
@@ -19,7 +21,12 @@ class SearchExperiencePolicyCharacter(V91CompactCharacter):
     def _search_experience_context(event: Event) -> str | None:
         if event.actor is None or event.context is None:
             return None
-        return f"search_task:{event.context}|entity:{event.actor}"
+        # v9.1's canonical habit serialization reserves `|` between context and
+        # action. Percent-encode both subject-accessible components so the derived
+        # context remains one losslessly reconstructible string without adding state.
+        task = quote(str(event.context), safe="")
+        actor = quote(str(event.actor), safe="")
+        return f"search_task:{task};entity:{actor}"
 
     def _score_action(
         self,
