@@ -1,0 +1,39 @@
+name: exp008-review2
+
+on:
+  push:
+    branches:
+      - exp008-search-experience-policy
+    paths:
+      - ".github/workflows/exp008-review2.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  reviewer2:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify repaired production is unchanged from frozen commit
+        run: |
+          git diff --exit-code c42a43d353b21061b97cabb665e8ef59544d27c9 -- src/lifelike_min/exp008_challenger.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run untouched EXP-008 reviewer generation 2
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/exp008-review2
+          python -m lifelike_min.exp008_review2 --json results/exp008-review2/review2.json
+      - name: Preserve reviewer generation 2 evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp008-review2
+          path: results/exp008-review2/review2.json
+          if-no-files-found: warn
