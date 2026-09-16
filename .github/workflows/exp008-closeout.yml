@@ -1,0 +1,61 @@
+name: exp008-closeout
+
+on:
+  push:
+    branches:
+      - exp008-search-experience-policy
+    paths:
+      - "src/lifelike_min/exp008_closeout.py"
+      - ".github/workflows/exp008-closeout.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  closeout:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify EXP-008 production remains frozen
+        run: |
+          git diff --exit-code c42a43d353b21061b97cabb665e8ef59544d27c9 -- src/lifelike_min/exp008_challenger.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Replay complete repository regression suite
+        env:
+          PYTHONPATH: src
+        run: python -m unittest discover -s tests -v
+      - name: Replay v9.1 structural closeout
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/exp008-closeout
+          python -m lifelike_min.v9_1_structural_closeout_v2 --json results/exp008-closeout/v9_1_structural_closeout.json
+      - name: Replay EXP-008 development evidence
+        env:
+          PYTHONPATH: src
+        run: python -m lifelike_min.exp008_evaluation --json results/exp008-closeout/exp008_development.json
+      - name: Replay reviewer generation 1 unchanged
+        env:
+          PYTHONPATH: src
+        run: python -m lifelike_min.exp008_review1 --json results/exp008-closeout/reviewer1.json
+      - name: Preserve reviewer generation 2 unchanged
+        continue-on-error: true
+        env:
+          PYTHONPATH: src
+        run: python -m lifelike_min.exp008_review2 --json results/exp008-closeout/reviewer2_untouched.json
+      - name: Run semantic causal persistence and cost closeout
+        env:
+          PYTHONPATH: src
+        run: python -m lifelike_min.exp008_closeout --json results/exp008-closeout/closeout.json
+      - name: Preserve complete EXP-008 closeout evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp008-closeout
+          path: results/exp008-closeout
+          if-no-files-found: error
