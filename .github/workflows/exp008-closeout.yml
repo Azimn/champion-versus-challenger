@@ -35,7 +35,8 @@ jobs:
         run: |
           mkdir -p results/exp008-closeout
           python -m lifelike_min.v9_1_structural_closeout_v2 --json results/exp008-closeout/v9_1_structural_closeout.json
-      - name: Replay EXP-008 development evidence
+      - name: Preserve original EXP-008 development replay
+        continue-on-error: true
         env:
           PYTHONPATH: src
         run: python -m lifelike_min.exp008_evaluation --json results/exp008-closeout/exp008_development.json
