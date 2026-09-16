@@ -1,0 +1,34 @@
+name: exp008-review1-replay
+
+on:
+  push:
+    branches:
+      - exp008-search-experience-policy
+    paths:
+      - "src/lifelike_min/exp008_review1_replay.py"
+      - ".github/workflows/exp008-review1-replay.yml"
+
+permissions:
+  contents: read
+
+jobs:
+  reviewer-replay:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Replay unchanged reviewer generation 1
+        env:
+          PYTHONPATH: src
+        run: |
+          mkdir -p results/exp008-review1-replay
+          python -m lifelike_min.exp008_review1_replay --json results/exp008-review1-replay/review1-replay.json
+      - name: Preserve replay evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp008-review1-replay
+          path: results/exp008-review1-replay/review1-replay.json
+          if-no-files-found: warn
