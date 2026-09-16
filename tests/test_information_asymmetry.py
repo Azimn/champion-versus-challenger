@@ -1,3 +1,4 @@
+import gzip
 import json
 import tempfile
 import unittest
@@ -116,6 +117,8 @@ class PersistentInformationAsymmetryTests(unittest.TestCase):
             self.assertEqual(first_files, second_files)
             self.assertIn(Path("scenario.json"), first_files)
             self.assertIn(Path("RESULTS.md"), first_files)
+            self.assertIn(Path("trace_global.json.gz"), first_files)
+            self.assertIn(Path("trace_differential.json.gz"), first_files)
             self.assertIn(Path("global/manifest.json"), first_files)
             self.assertIn(Path("differential/manifest.json"), first_files)
             self.assertIn(Path("global/t07.json"), first_files)
@@ -124,6 +127,8 @@ class PersistentInformationAsymmetryTests(unittest.TestCase):
                 self.assertEqual((first / relative).read_bytes(), (second / relative).read_bytes())
             json.loads((first / "global/t04.json").read_text())
             json.loads((first / "differential/t04.json").read_text())
+            json.loads(gzip.decompress((first / "trace_global.json.gz").read_bytes()))
+            json.loads(gzip.decompress((first / "trace_differential.json.gz").read_bytes()))
 
 
 if __name__ == "__main__":
