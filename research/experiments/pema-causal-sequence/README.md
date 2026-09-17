@@ -24,6 +24,8 @@ Observed link:
 
 The action-selection policy is unchanged across conditions. Global access produces `SURPRISE_B`; differential access surfaces conflicting history and produces `ASK_B_FIRST`.
 
+The uniform-priority ablation assigns every proposal priority 0.50 and uses the same deterministic tie context in both access conditions. The same actor wins in both runs, removing the knowledge-dependent allocation difference while leaving the private information states themselves intact.
+
 This experiment is intentionally small. It does not yet model strategic bidding, reserve staking, multiple resources, or learned demand functions.
 
 ## Experiment 3: history changes future competitiveness
@@ -86,4 +88,4 @@ These are constructed mechanism tests, not evidence that a full artificial organ
 
 ## Run
 
-The repository-wide test suite executes all four experiments through `tests/test_pema_sequence.py`. The PEMA sequence is deterministic and is tested alongside the original information-asymmetry and metabolic experiments on Python 3.11 and 3.12.
+The repository-wide test suite executes all four experiments through `tests/test_pema_sequence.py` and `tests/test_pema_sequence_ablation.py`. The PEMA sequence is deterministic and is tested alongside the original information-asymmetry and metabolic experiments on Python 3.11 and 3.12.
