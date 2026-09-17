@@ -1,0 +1,56 @@
+name: exp010-foundation-v2
+
+on:
+  push:
+    branches:
+      - exp010-minimum-information-suppression
+    paths:
+      - "src/lifelike_min/exp010_foundation_v2.py"
+      - ".github/workflows/exp010-foundation-v2.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  foundation:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify frozen v9.2 production unchanged
+        run: |
+          test "$(git merge-base HEAD bd1ca22ca58e82012f1a8237e3de4bfee4dbf59d)" = "bd1ca22ca58e82012f1a8237e3de4bfee4dbf59d"
+          git diff --exit-code bd1ca22ca58e82012f1a8237e3de4bfee4dbf59d -- \
+            src/lifelike_min/exp009_challenger.py \
+            src/lifelike_min/v9_1_compact.py \
+            src/lifelike_min/v9_compact.py \
+            src/lifelike_min/exp004_challenger.py \
+            src/lifelike_min/exp005_challenger.py \
+            src/lifelike_min/exp006_challenger.py \
+            src/lifelike_min/exp007_challenger.py
+      - name: Verify failed foundation harness preserved unchanged
+        run: git diff --exit-code fec4c15cc1c24ce9197115ea19625f7a7197c292 -- src/lifelike_min/exp010_foundation.py
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - name: Run complete repository tests
+        env:
+          PYTHONPATH: src
+        run: python -m unittest discover -s tests -v
+      - name: Replay strict v9.2 earned contract
+        env:
+          PYTHONPATH: src
+        run: python -m lifelike_min.exp009_closeout_v2 --json results/exp010-foundation-v2/v9-2-closeout.json
+      - name: Run corrected information-loss foundation
+        env:
+          PYTHONPATH: src
+        run: python -m lifelike_min.exp010_foundation_v2 --json results/exp010-foundation-v2/foundation.json
+      - name: Preserve corrected foundation evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp010-foundation-v2
+          path: results/exp010-foundation-v2
+          if-no-files-found: warn
