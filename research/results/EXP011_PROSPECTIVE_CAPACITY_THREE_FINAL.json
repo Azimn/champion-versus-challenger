@@ -1,0 +1,80 @@
+{
+  "experiment": "EXP-011",
+  "decision": "PROMOTE",
+  "predecessor": {
+    "version": "v9.3_concern_capacity_three",
+    "branch": "champion-v9-3-concern-capacity-three",
+    "commit": "a10bc27579bf5bd0ff1a90d6ad6e3f337d8ed7bc"
+  },
+  "candidate": {
+    "version": "v9.4_prospective_capacity_three",
+    "production_commit": "359682f463393dadeef53c8fc7a8c65eef5be8b4",
+    "production_blob_sha": "4238680bb78c21dd71b55cf279b2e4e2ce0e03a8",
+    "mechanism_count": 11,
+    "concern_capacity": 3,
+    "prospective_capacity": 3,
+    "eligibility_capacity": 2
+  },
+  "preregistration_commit": "9cf3cfab5259cd9e12f58e6dbf95f28eae7218d9",
+  "closeout": {
+    "run_id": 35276313274,
+    "python_3_12_artifact_id": 10520497574,
+    "repository_tests": "72 passed, 18 subtests passed",
+    "python_versions": ["3.11", "3.12"]
+  },
+  "capacity_tournament": {
+    "2": "FAIL",
+    "3": "PASS",
+    "4": "PASS_NO_ADDITIONAL_REQUIRED_TARGET_BEHAVIOR",
+    "selected": 3
+  },
+  "causal_ablation": {
+    "capacity_3": "first retained and cue_first reactivates first",
+    "capacity_2": "first evicted and cue_first cannot reactivate first"
+  },
+  "information_lower_bound": "After capacity-two eviction, the lost first identity+cue history is canonically indistinguishable from a matched history in which first never existed. Recovery requires the retained commitment identity plus its associated future cue.",
+  "reviewers": {
+    "development_failure_1": {
+      "run_id": 35275519835,
+      "classification": "invalid evaluator assumption / termination-semantics error",
+      "production_changed": false
+    },
+    "development_corrected": {
+      "run_id": 35275738887,
+      "result": "PASS"
+    },
+    "review1": {
+      "run_id": 35275898549,
+      "raw": "42/43",
+      "sole_failure": "fill_activate_refill_cues",
+      "classification": "invalid reviewer assumption / cross-capacity contract error",
+      "adjudication_run_id": 35276094004,
+      "adjudication": "PASS",
+      "production_changed": false
+    },
+    "review2": {
+      "run_id": 35276185423,
+      "result": "31/31 PASS"
+    }
+  },
+  "state_cost_bytes": {
+    "fresh": {"canonical": 245, "diagnostic": 269},
+    "one_prospective": {"canonical": 303, "diagnostic": 328},
+    "two_prospective": {"canonical": 348, "diagnostic": 375},
+    "three_prospective": {"canonical": 378, "diagnostic": 407},
+    "marginal_third": {"canonical": 30, "diagnostic": 32}
+  },
+  "bounded_frontier": "A fourth distinct prospective commitment can still evict the oldest extant identity+cue record under the inherited replacement rule; the lost record cannot be reconstructed from subject-owned state.",
+  "supported_claim": "For the current demonstrated behavioral envelope, the existing prospective commitment mechanism requires capacity for three simultaneous identity + cue associations; capacity two causes irreversible information loss in the tested three-commitment history.",
+  "not_established": [
+    "general prospective memory capacity",
+    "human working-memory limits",
+    "planning",
+    "rehearsal",
+    "forgetting",
+    "intention prioritization",
+    "unlimited future commitments",
+    "prospective aging",
+    "prospective extinction"
+  ]
+}
