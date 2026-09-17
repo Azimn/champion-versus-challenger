@@ -1,0 +1,35 @@
+name: v9-4-freeze-verify
+on:
+  push:
+    branches: [champion-v9-4-prospective-capacity-three]
+permissions: {contents: read}
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with: {fetch-depth: 0}
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install -e . pytest
+      - run: |
+          test "$(git branch --show-current)" = "champion-v9-4-prospective-capacity-three"
+          test "$(git hash-object src/lifelike_min/exp011_challenger.py)" = "4238680bb78c21dd71b55cf279b2e4e2ce0e03a8"
+      - run: pytest -q
+      - run: python -m lifelike_min.exp011_closeout --json results/exp011/frozen-closeout.json
+      - run: python -m lifelike_min.post_exp011_failure_revalidation --json results/exp011/post-freeze-frontier.json
+      - run: |
+          python - <<'PY'
+          from lifelike_min.exp011_challenger import CapacityThreeProspectiveCharacter
+          a=CapacityThreeProspectiveCharacter()
+          assert a.mechanism_count()==11
+          assert a.max_concerns==3
+          assert a.max_prospective==3
+          assert a.max_eligibility_records==2
+          assert len(a.serialize_persistent().encode())==245
+          assert a.persistent_state_bytes()==269
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v9-4-freeze-verification
+          path: results/exp011/*.json
