@@ -1,0 +1,18 @@
+{
+  "experiment": "EXP-012",
+  "frozen_before_challenger_results": true,
+  "operator": "v_next = v * retention_factor per qualifying experienced event",
+  "behavioral_gates": {
+    "short_gap_10_min_fraction_of_initial": 0.97,
+    "long_gap_1000_max_fraction_of_initial": 0.86,
+    "old_recent_choice_must_be_order_invariant": true,
+    "sign_inversion_allowed": false
+  },
+  "candidates": [
+    {"name":"control","retention_factor":1.0,"experiential_half_life_events":null},
+    {"name":"very_slow","retention_factor":0.9999,"experiential_half_life_events":6931.125},
+    {"name":"intermediate","retention_factor":0.9995,"experiential_half_life_events":1385.948},
+    {"name":"too_fast","retention_factor":0.99,"experiential_half_life_events":68.968}
+  ],
+  "selection_rule": "Among candidates passing every required gate and historical regression, choose the retention factor closest to 1.0. Do not interpolate a new rate after observing results."
+}
