@@ -1,0 +1,29 @@
+{
+  "audit": "MBASE-001",
+  "champion": "v9.3_concern_capacity_three",
+  "champion_commit": "a10bc27579bf5bd0ff1a90d6ad6e3f337d8ed7bc",
+  "unit_of_coverage": "behavioral capability family, not raw test count",
+  "fixed_capacities": {"concerns": 3, "prospective_commitments": 2, "eligibility_records": 2},
+  "capabilities": [
+    {"id":"fatigue_pressure","established_by":["EXP-002 lineage","global structural ablation"],"mechanisms":["fatigue"],"success":"Accumulated fatigue can make rest win and rest reduces fatigue."},
+    {"id":"affiliation_pressure","established_by":["EXP-002 lineage","global structural ablation"],"mechanisms":["affiliation"],"success":"Affiliation pressure can make social approach win and socializing reduces that pressure."},
+    {"id":"competence_pressure","established_by":["EXP-002 lineage","global structural ablation"],"mechanisms":["competence"],"success":"Competence pressure contributes to work selection and work reduces it."},
+    {"id":"partner_specific_relationship_history","established_by":["EXP-002"],"mechanisms":["relationship_history","affiliation"],"success":"Experienced support/hostility changes later social behavior for the experienced partner without equivalent change for another partner."},
+    {"id":"affective_carryover_decay","established_by":["EXP-002"],"mechanisms":["affect_residue"],"success":"Threat experience affects later avoidance after the immediate event and the carryover decays."},
+    {"id":"contextual_habit_learning","established_by":["EXP-002"],"mechanisms":["habit_learning"],"success":"Experienced reward changes later choice in the same context without globally biasing unrelated contexts."},
+    {"id":"partner_reliability_expectation","established_by":["EXP-002"],"mechanisms":["partner_reliability"],"success":"Observed reliability/unreliability changes later delegate/verify behavior for that partner."},
+    {"id":"uncertainty_behavior","established_by":["EXP-003"],"mechanisms":["partner_reliability"],"policy":"uncertainty policy is causal but has no persistent state and is not counted as a separate persistent mechanism","success":"Unknown or near-neutral partners are verified without action-order tie artifacts."},
+    {"id":"bounded_unresolved_concerns","established_by":["EXP-004","EXP-010"],"mechanisms":["concern_ledger"],"success":"Multiple unresolved concerns coexist under the fixed capacity-three bound and stronger current concerns can dominate without overwriting all weaker identities."},
+    {"id":"unresolved_existence_vs_activation","established_by":["EXP-009"],"mechanisms":["concern_ledger"],"success":"An unresolved concern remains represented while activation decays far below the former deletion threshold; cancellation/work still terminate it."},
+    {"id":"three_way_concern_suppression_return","established_by":["EXP-010"],"mechanisms":["concern_ledger"],"success":"A weaker third unresolved concern remains non-dominant during stronger competition and becomes ordinarily eligible after stronger concerns terminate."},
+    {"id":"prospective_cue_reactivation","established_by":["EXP-005"],"mechanisms":["prospective_commitments","concern_ledger"],"success":"A latent future commitment exerts no ordinary concern pressure before its cue and becomes an ordinary concern when the experienced cue occurs."},
+    {"id":"subjective_location_fact","established_by":["EXP-006"],"mechanisms":["subjective_facts"],"success":"Directly observed location is retained and guides search."},
+    {"id":"hidden_world_non_interference","established_by":["EXP-006"],"mechanisms":["subjective_facts"],"success":"A hidden simulator world change does not alter subject-owned location belief or behavior."},
+    {"id":"direct_observation_revision","established_by":["EXP-006"],"mechanisms":["subjective_facts"],"success":"A later direct observation revises the subject-owned location fact and changes subsequent search behavior."},
+    {"id":"immediate_action_learning","established_by":["EXP-002","EXP-007 structural compaction"],"mechanisms":["habit_learning","eligibility_trace"],"success":"An immediate experienced outcome can update the uniquely eligible immediately preceding contextual action without obsolete last-action persistence."},
+    {"id":"bounded_context_delayed_credit","established_by":["EXP-007"],"mechanisms":["eligibility_trace","habit_learning"],"success":"A delayed experienced outcome updates a live uniquely context-matched prior action with age-derived eligibility."},
+    {"id":"ambiguity_abstention","established_by":["EXP-007"],"mechanisms":["eligibility_trace","habit_learning"],"success":"When multiple distinct live actions share the experienced outcome context, the organism abstains rather than inventing a hidden cause."},
+    {"id":"renderer_invariance","established_by":["EXP-002 through EXP-010"],"mechanisms":[],"success":"Changing or invoking presentation does not alter organism decisions or persistent state."},
+    {"id":"persistent_reconstruction","established_by":["v9.1 structural closeout","EXP-009","EXP-010"],"mechanisms":["fatigue","affiliation","competence","relationship_history","affect_residue","habit_learning","partner_reliability","concern_ledger","prospective_commitments","subjective_facts","eligibility_trace"],"success":"Canonical serialize/destroy/restore preserves subject-owned causal state and continuation behavior."}
+  ]
+}
