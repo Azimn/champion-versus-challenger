@@ -178,11 +178,12 @@ def run_endogenous_demand_experiment(
     """Experiment 2: local knowledge changes demand and therefore allocation."""
     local = _birthday_local_state(access)
     proposals = _experiment_2_proposals(local, uniform_priority=uniform_priority)
+    round_id = "experiment2:uniform" if uniform_priority else f"experiment2:endogenous:{access.value}"
     allocation = allocate_operations(
         proposals,
         capacity=capacity,
         seed=0,
-        round_id=f"experiment2:{access.value}:{'uniform' if uniform_priority else 'endogenous'}",
+        round_id=round_id,
     )
     winners = [record for record in allocation if record.granted]
 
