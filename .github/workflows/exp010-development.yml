@@ -1,0 +1,48 @@
+name: exp010-development
+
+on:
+  push:
+    branches: [exp010-minimum-information-suppression]
+    paths:
+      - 'src/lifelike_min/exp010_*.py'
+      - 'tests/test_exp010.py'
+      - '.github/workflows/exp010-development.yml'
+  workflow_dispatch:
+
+jobs:
+  regression:
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version: ['3.11', '3.12']
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify ancestry and frozen production mutation
+        run: |
+          test "$(git merge-base HEAD bd1ca22ca58e82012f1a8237e3de4bfee4dbf59d)" = "bd1ca22ca58e82012f1a8237e3de4bfee4dbf59d"
+          git diff --exit-code 03baf6bc6f06d3f298701a8ce66c44e00f509d50 -- src/lifelike_min/exp010_challenger.py
+          if git cat-file -e bcf8a038bae8e69040f41be173626d098f0ea720:src/lifelike_min/exp010_challenger.py 2>/dev/null; then
+            echo 'challenger existed at preregistration commit' >&2
+            exit 1
+          fi
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: Complete repository tests
+        env:
+          PYTHONPATH: src
+        run: python -m unittest discover -s tests -v
+      - name: EXP-010 development evaluation
+        env:
+          PYTHONPATH: src
+        run: python -m lifelike_min.exp010_evaluation --json results/exp010-development-${{ matrix.python-version }}.json
+      - name: Upload development evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: exp010-development-${{ matrix.python-version }}
+          path: results/exp010-development-${{ matrix.python-version }}.json
+          if-no-files-found: warn
