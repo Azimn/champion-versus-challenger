@@ -1,0 +1,21 @@
+name: mbase-002-post-exp012
+on:
+  push:
+    branches:
+      - mbase-002-post-exp012
+jobs:
+  audit:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e . pytest
+      - run: test "$(git hash-object src/lifelike_min/exp012_challenger.py)" = "9c6474de1918b62e827d32deff2fa10a4b2443d1"
+      - run: pytest -q
+      - run: python -m lifelike_min.mbase002_audit --json results/mbase002/subsets.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mbase-002-post-exp012
+          path: results/mbase002/*.json
