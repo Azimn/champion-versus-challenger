@@ -1,0 +1,25 @@
+name: exp011-review1
+on:
+  push:
+    branches: [exp011-prospective-capacity]
+    paths:
+      - 'src/lifelike_min/exp011_review1.py'
+      - '.github/workflows/exp011-review1.yml'
+permissions: {contents: read}
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install -e . pytest
+      - run: pytest -q
+      - run: python -m lifelike_min.exp011_evaluation --json results/exp011/development-replay.json
+      - run: python -m lifelike_min.exp011_review1 --json results/exp011/review1.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exp011-review1
+          path: |
+            results/exp011/development-replay.json
+            results/exp011/review1.json
