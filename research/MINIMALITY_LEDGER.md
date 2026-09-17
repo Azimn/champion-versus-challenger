@@ -45,4 +45,4 @@ This trajectory is evidence for a locally stabilizing causal basis with still-ev
 
 EXP-012 adds zero persistent dimensions but is not computationally free. The current attenuation implementation scans stored habit entries on each processed event, so update work scales O(n) with habit count. This cost is tracked separately from mechanism count and serialized-state dimensionality.
 
-MBASE-001's exact subset result belongs to pre-EXP-012 production semantics. An updated subset-minimality statement requires the post-EXP-012 basis audit.
+MBASE-001's exact subset result belongs to pre-EXP-012 production semantics. MBASE-002 independently re-ran all 2^11 = 2048 subsets after EXP-012 and found the mechanism basis stable: exactly one subset covers all 20 current capability families, and it is the complete 11-mechanism set. The updated frontier is 0→2/20, 1→5/20, 2→8/20, 3→10/20, 4→13/20, 5→14/20, 6→15/20, 7→16/20, 8→17/20, 9→18/20, 10→19/20, 11→20/20.
