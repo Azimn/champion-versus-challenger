@@ -1,0 +1,37 @@
+name: v9-5-freeze-verify
+on:
+  push:
+    branches:
+      - champion-v9-5-habit-temporal-plasticity
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e . pytest
+      - run: test "$(git branch --show-current)" = "champion-v9-5-habit-temporal-plasticity"
+      - run: test "$(git hash-object src/lifelike_min/exp012_challenger.py)" = "9c6474de1918b62e827d32deff2fa10a4b2443d1"
+      - run: pytest -q
+      - run: python -m lifelike_min.exp012_closeout --json results/exp012/frozen-closeout.json
+      - run: python -m lifelike_min.post_exp012_failure_revalidation --json results/exp012/frozen-frontier.json
+      - run: |
+          python - <<'PY'
+          from lifelike_min.exp012_challenger import HabitTemporalPlasticityCharacter
+          a=HabitTemporalPlasticityCharacter()
+          assert a.mechanism_count()==11
+          assert a.max_concerns==3
+          assert a.max_prospective==3
+          assert a.max_eligibility_records==2
+          assert len(a.serialize_persistent().encode())==245
+          assert a.persistent_state_bytes()==269
+          assert a.habit_nonuse_retention==0.9995
+          PY
+      - uses: actions/upload-artifact@v4
+        with:
+          name: v9-5-freeze-verification
+          path: results/exp012/*.json
