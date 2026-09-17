@@ -40,7 +40,7 @@ This lineage records the experimentally promoted sequence used by the minimal no
 | `v9.1_compact` | Global structural ablation | No new behavior; removes redundant concern compatibility state, duplicate last-action state, dead idle-habit storage, and unearned store capacity | 11 | branch `champion-v9-1-compact`; commit `2856ec6a32be0347a9243f6eff6faa404a9a0e6c`; closeout run `35051162103` | Superseded by v9.2 |
 | `v9.2_unresolved_concern_persistence` | EXP-009 | Separates unresolved concern membership from momentary activation without new persistent fields or mechanisms | 11 | branch `champion-v9-2-unresolved-concern-persistence`; commit `bd1ca22ca58e82012f1a8237e3de4bfee4dbf59d`; closeout run `35138150402` | Superseded by v9.3 |
 | `v9.3_concern_capacity_three` | EXP-010 | Raises existing concern-ledger capacity from two to three after proving the suppressed concern was irrecoverably absent at capacity two | 11 | branch `champion-v9-3-concern-capacity-three`; commit `a10bc27579bf5bd0ff1a90d6ad6e3f337d8ed7bc` | Superseded by v9.4 |
-| `v9.4_prospective_capacity_three` | EXP-011 | Raises existing prospective identity+cue capacity from two to three after proving the evicted third commitment was irrecoverably absent at capacity two | 11 | branch `champion-v9-4-prospective-capacity-three`; commit `5f949c6e882f780e1d4c07f0b6b3bccf330936aa`; production blob `4238680bb78c21dd71b55cf279b2e4e2ce0e03a8`; closeout run `35276313274`; frozen verification run `35276731608` | Current branch-local behavioral champion |
+| `v9.4_prospective_capacity_three` | EXP-011 | Raises existing prospective identity+cue capacity from two to three after proving the evicted third commitment was irrecoverably absent at capacity two | 11 | branch `champion-v9-4-prospective-capacity-three`; commit `5f949c6e882f780e1d4c07f0b6b3bccf330936aa`; production blob `4238680bb78c21dd71b55cf279b2e4e2ce0e03a8`; closeout run `35276313274`; frozen verification run `35276731608` | Superseded by v9.5 |\n| `v9.5_habit_temporal_plasticity` | EXP-012 | Existing signed habit scalar attenuates toward neutral across processed subject-experienced nonuse events; zero new persistent state dimensions | 11 | production blob `9c6474de1918b62e827d32deff2fa10a4b2443d1`; closeout run `35281801241` | Current branch-local behavioral champion |
 
 ### v9 freeze note
 
@@ -73,3 +73,8 @@ Post-freeze revalidation eliminated `third_commitment_is_forgotten` and preserve
 ## Freeze rule
 
 Once a champion is named for an experiment series, its code, configuration, adapter, scenario mappings, and dependency environment are frozen for that series. Bug fixes or configuration changes create a new candidate reference. They are not silently applied to the champion during comparison.
+
+
+### v9.5 EXP-012 note
+
+EXP-012 changed no persistent schema and added no counted mechanism. The existing contextual habit/action-value scalar now represents current learned support, integrating both outcome learning and subsequent subject-experienced nonuse. The selected retention factor is 0.9995 per qualifying processed event. Fresh state remains 245 canonical / 269 diagnostic bytes. The implementation has O(n) per-event attenuation cost over stored habits. Event count is an experiential clock, so event segmentation is an explicit limitation. Reviewer passes were 9/9 and 8/8 with no production repair. The target failure was eliminated; ancient prospective permanence and deterministic rhythm remain reproduced.
