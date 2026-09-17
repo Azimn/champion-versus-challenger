@@ -1,0 +1,18 @@
+name: exp011-foundation
+on:
+  push:
+    branches: [mbase-001-mechanism-basis-audit]
+    paths: ['src/lifelike_min/exp011_foundation.py','.github/workflows/exp011-foundation.yml']
+permissions: {contents: read}
+jobs:
+  characterize:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install -e . pytest
+      - run: pytest -q
+      - run: python -m lifelike_min.exp011_foundation --json results/exp011/foundation.json
+      - uses: actions/upload-artifact@v4
+        with: {name: exp011-foundation, path: results/exp011/foundation.json}
