@@ -47,6 +47,8 @@ Differential access:
 
 The allocator therefore responds to private epistemic state rather than a globally assigned importance value.
 
+In the uniform-priority ablation, every operation receives 0.50 and both access conditions use the same deterministic tie context. The same actor wins in both runs. Removing epistemically derived priority therefore removes the knowledge-dependent allocation difference.
+
 This does not establish that the particular priority equation is psychologically correct. The priority values are deliberately hand specified to test the causal link itself.
 
 ## Experiment 3
