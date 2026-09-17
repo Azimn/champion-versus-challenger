@@ -1,0 +1,22 @@
+name: exp012-development
+on:
+  push:
+    branches: [exp012-habit-temporal-plasticity]
+jobs:
+  develop:
+    strategy:
+      matrix:
+        python: ["3.11","3.12"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: ${{ matrix.python }}}
+      - run: pip install -e . pytest
+      - run: pytest -q
+      - run: python -m lifelike_min.exp012_foundation --json results/exp012/foundation-${{ matrix.python }}.json
+      - run: python -m lifelike_min.exp012_development --json results/exp012/development-${{ matrix.python }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exp012-development-${{ matrix.python }}
+          path: results/exp012/*.json
