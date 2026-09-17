@@ -1,0 +1,23 @@
+name: post-v94-frontier-diagnosis
+on:
+  push:
+    branches: [post-v9-4-frontier-diagnosis]
+    paths:
+      - 'src/lifelike_min/post_v94_frontier_diagnosis.py'
+      - '.github/workflows/post-v94-frontier-diagnosis.yml'
+permissions: {contents: read}
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install -e . pytest
+      - run: pytest -q
+      - run: python -m lifelike_min.post_exp011_failure_revalidation --json results/post-v94/frontier.json
+      - run: python -m lifelike_min.post_v94_frontier_diagnosis --json results/post-v94/diagnosis.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: post-v94-frontier-diagnosis
+          path: results/post-v94/*.json
