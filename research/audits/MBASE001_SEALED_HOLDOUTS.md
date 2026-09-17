@@ -1,0 +1,14 @@
+# MBASE-001 Sealed Cross-Mechanism Holdouts
+
+Committed before the exhaustive subset result is inspected. These scenarios test interactions among already-earned capabilities only. They are not optimization targets and do not add new capability families.
+
+1. **Relationship + affect recovery**: Morgan delivers hostility; immediate hostility is gone on a later event but both partner-specific negative relationship history and decaying threat residue initially bias avoidance. After sufficient unrelated time, affect residue decays while partner-specific history remains distinguishable from an unexperienced Sarah history.
+2. **Relationship + reliability separation**: Morgan is supportive but observed unreliable; Sarah is hostile but observed reliable. Later social approach/avoidance follows relationship history while delegate/verify follows reliability, demonstrating independent partner-indexed state.
+3. **Concern + prospective activation under load**: two active concerns coexist while a latent prospective commitment remains non-pressing. Its cue activates it as the third concern without changing the capacity-three bound; cancelling a stronger concern leaves the cued concern represented.
+4. **Concern competition + base pressures**: a weak unresolved concern remains represented while high fatigue legitimately selects rest; after rest and with work pressure relevant, the concern can contribute to work without having been deleted by non-selection.
+5. **Subjective fact + learned action state separation**: direct location observation controls search prior while a learned contextual routine exists in a different context. Updating the location fact must not mutate the unrelated learned routine. This does not import EXP-008's rejected search-value reconciliation semantics.
+6. **Habit + eligibility delayed credit**: two contextual actions in distinct contexts coexist as live eligibility records; delayed reward in one context updates only its corresponding habit value, preserving the other context.
+7. **Prospective + concern-capacity pressure**: a latent commitment cues into a ledger already holding three concerns; ordinary strength-based concern capacity decides the represented set. The prospective store itself does not become a hidden fourth active slot.
+8. **Multi-process reconstruction**: serialize/restore while relationship, affect, habit, reliability, three concerns, one prospective commitment, one subjective fact, and live eligibility evidence coexist. Continuation after restore must match the uninterrupted organism for an identical event sequence.
+
+Opening rule: identify historical-manifest minimal/full-coverage and selected near-minimal frontier candidates first. Then implement these scenarios without changing their meanings or expected interaction semantics. If a holdout reveals an invalid expectation, preserve the original and classify it rather than silently rewriting it.
