@@ -1,0 +1,21 @@
+name: post-v9-5-frontier-diagnosis
+on:
+  push:
+    branches:
+      - post-v9-5-frontier-diagnosis
+jobs:
+  diagnose:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e . pytest
+      - run: test "$(git hash-object src/lifelike_min/exp012_challenger.py)" = "9c6474de1918b62e827d32deff2fa10a4b2443d1"
+      - run: pytest -q
+      - run: python -m lifelike_min.post_v95_frontier_diagnosis --json results/post-v95/diagnosis.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: post-v95-frontier-diagnosis
+          path: results/post-v95/*.json
