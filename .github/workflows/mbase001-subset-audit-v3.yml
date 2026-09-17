@@ -3,7 +3,7 @@ on:
   push:
     branches: [mbase-001-mechanism-basis-audit]
     paths: ['src/lifelike_min/mbase001_audit_v3.py','.github/workflows/mbase001-subset-audit-v3.yml']
-permissions: {contents: read}
+permissions: {contents: write}
 jobs:
   audit:
     runs-on: ubuntu-latest
@@ -16,3 +16,20 @@ jobs:
       - run: python -m lifelike_min.mbase001_audit_v3 --json results/mbase-001/subsets-v3.json
       - uses: actions/upload-artifact@v4
         with: {name: mbase001-subsets-v3, path: results/mbase-001/subsets-v3.json}
+      - name: Permanently encode all final subset rows
+        run: |
+          python - <<'PY'
+          import json,zlib,base64,hashlib
+          d=json.load(open('results/mbase-001/subsets-v3.json')); caps=list(d['full_reference']['capabilities']); rows=[]
+          for mask,row in enumerate(d['rows']):
+              failed=sum((1<<i) for i,c in enumerate(caps) if not row['capabilities'][c])
+              rows.append([mask,row['coverage'],failed,row['fresh_projected_canonical_bytes'],int(row['structurally_valid'])])
+          decoded={'format':'mask,coverage,failed_capability_bitmask,fresh_projected_canonical_bytes,structurally_valid','mechanisms':d['mechanisms'],'capability_bit_order':caps,'rows':rows}
+          raw=(json.dumps(decoded,separators=(',',':'))+'\n').encode(); out={'encoding':'zlib+base64','decoded_format':'JSON containing all final corrected 2048 subset rows','decoded_sha256':hashlib.sha256(raw).hexdigest(),'payload':base64.b64encode(zlib.compress(raw,9)).decode()}
+          open('research/audits/MBASE001_SUBSET_RESULTS_FINAL.json','w').write(json.dumps(out,separators=(',',':'))+'\n')
+          PY
+          git config user.name 'mbase-audit-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add research/audits/MBASE001_SUBSET_RESULTS_FINAL.json
+          git commit -m 'Persist final corrected MBASE-001 subset matrix'
+          git push
