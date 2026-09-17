@@ -1,0 +1,22 @@
+name: exp012-review1
+on:
+  push:
+    branches:
+      - exp012-habit-temporal-plasticity
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: pip install -e . pytest
+      - run: test "$(git hash-object src/lifelike_min/exp012_challenger.py)" = "9c6474de1918b62e827d32deff2fa10a4b2443d1"
+      - run: pytest -q
+      - run: python -m lifelike_min.exp012_development --json results/exp012/replay-development.json
+      - run: python -m lifelike_min.exp012_review1 --json results/exp012/reviewer1.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exp012-review1
+          path: results/exp012/*.json
