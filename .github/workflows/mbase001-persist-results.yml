@@ -1,0 +1,42 @@
+name: mbase001-persist-results
+on:
+  push:
+    branches: [mbase-001-mechanism-basis-audit]
+    paths: ['.github/workflows/mbase001-persist-results.yml']
+permissions:
+  contents: write
+jobs:
+  persist:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -e .
+      - name: Reproduce exhaustive result
+        run: python -m lifelike_min.mbase001_audit --json /tmp/subsets.json
+      - name: Encode all 2048 rows compactly and exactly
+        run: |
+          python - <<'PY'
+          import json, zlib, base64, hashlib
+          d=json.load(open('/tmp/subsets.json'))
+          caps=list(d['full_reference']['capabilities'])
+          rows=[]
+          for mask,row in enumerate(d['rows']):
+              failed=0
+              for i,cap in enumerate(caps):
+                  if not row['capabilities'][cap]: failed |= 1 << i
+              rows.append([mask,row['coverage'],failed,row['fresh_audit_canonical_bytes'],int(row['structurally_valid'])])
+          decoded={'format':'mask,coverage,failed_capability_bitmask,fresh_audit_canonical_bytes,structurally_valid','mechanisms':d['mechanisms'],'capability_bit_order':caps,'rows':rows}
+          raw=(json.dumps(decoded,separators=(',',':'))+'\n').encode()
+          out={'encoding':'zlib+base64','decoded_format':'JSON containing all 2048 subset rows','decoded_sha256':hashlib.sha256(raw).hexdigest(),'payload':base64.b64encode(zlib.compress(raw,9)).decode()}
+          open('research/audits/MBASE001_SUBSET_RESULTS_ENCODED.json','w').write(json.dumps(out,separators=(',',':'))+'\n')
+          PY
+      - name: Commit exact permanent result
+        run: |
+          git config user.name 'mbase-audit-bot'
+          git config user.email 'actions@users.noreply.github.com'
+          git add research/audits/MBASE001_SUBSET_RESULTS_ENCODED.json
+          git commit -m 'Replace MBASE-001 subset encoding with exact reproduced data'
+          git push
