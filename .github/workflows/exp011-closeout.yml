@@ -1,0 +1,28 @@
+name: exp011-closeout
+on:
+  push:
+    branches: [exp011-prospective-capacity]
+    paths:
+      - 'src/lifelike_min/exp011_closeout.py'
+      - '.github/workflows/exp011-closeout.yml'
+permissions: {contents: read}
+jobs:
+  closeout:
+    strategy:
+      matrix:
+        python-version: ['3.11','3.12']
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '${{ matrix.python-version }}'}
+      - run: pip install -e . pytest
+      - run: pytest -q
+      - run: python -m lifelike_min.exp011_evaluation --json results/exp011/development-${{ matrix.python-version }}.json
+      - run: python -m lifelike_min.exp011_review1_adjudication --json results/exp011/review1-adjudication-${{ matrix.python-version }}.json
+      - run: python -m lifelike_min.exp011_review2 --json results/exp011/review2-${{ matrix.python-version }}.json
+      - run: python -m lifelike_min.exp011_closeout --json results/exp011/closeout-${{ matrix.python-version }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exp011-closeout-${{ matrix.python-version }}
+          path: results/exp011/*.json
