@@ -65,7 +65,7 @@ def run():
     baseline_after_three = base.persistent_snapshot()
     require(t,"baseline_capacity_two", base.max_prospective==2, base.max_prospective)
     require(t,"baseline_eviction", list(base.prospective_commitments.items())==[("second","cue_second"),("third","cue_third")], dict(base.prospective_commitments))
-    before_cue=canonical(base); cue(base,"cue_first")
+    cue(base,"cue_first")
     require(t,"baseline_cue_first_fails", "first" not in base.concerns and "first" not in base.prospective_commitments, base.persistent_snapshot())
 
     history_a=CapacityThreeConcernCharacter(); commit(history_a,"first","cue_first"); commit(history_a,"second","cue_second"); commit(history_a,"third","cue_third")
@@ -98,7 +98,6 @@ def run():
             x=CapacityThreeProspectiveCharacter()
             for i in insertion: commit(x,identities[i],cues[i])
             for i in cue_order:
-                before=set(x.concerns)
                 cue(x,cues[i])
                 require(t,f"cue_perm_{insertion}_{cue_order}_{i}",identities[i] in x.concerns and identities[i] not in x.prospective_commitments,{"concerns":dict(x.concerns),"prospective":dict(x.prospective_commitments)})
                 permutation_cases+=1
@@ -142,11 +141,20 @@ def run():
     commit(a,"weak_future","weak_cue"); cue(a,"weak_cue")
     require(t,"prospective_activation_obeys_concern_capacity",len(a.concerns)<=3,a.persistent_snapshot())
 
-    # Cancellation / activation / work / repeated cue.
+    # Cancellation / activation / incremental work-mediated resolution / repeated cue.
     a=CapacityThreeProspectiveCharacter(); commit(a,"cancel_me","c_cancel"); a.step(Event(kind="task_cancel",concern="cancel_me",forced_action="idle")); cue(a,"c_cancel")
     require(t,"cancelled_latent_does_not_resurrect","cancel_me" not in a.concerns,a.persistent_snapshot())
-    a=CapacityThreeProspectiveCharacter(); commit(a,"work_me","c_work"); cue(a,"c_work"); pre=dict(a.concerns); a.step(Event(kind="neutral",context="none",available_actions=("work",),forced_action="work")); post=dict(a.concerns); cue(a,"c_work")
-    require(t,"activation_then_work_no_prospective_resurrection","work_me" not in a.prospective_commitments and "work_me" not in post,a.persistent_snapshot())
+    a=CapacityThreeProspectiveCharacter(); commit(a,"work_me","c_work"); cue(a,"c_work")
+    require(t,"cue_consumes_binding_before_resolution","work_me" in a.concerns and "work_me" not in a.prospective_commitments,a.persistent_snapshot())
+    a.step(Event(kind="neutral",context="none",available_actions=("work",),forced_action="work"))
+    require(t,"one_work_does_not_recreate_binding","work_me" not in a.prospective_commitments,a.persistent_snapshot())
+    for _ in range(8):
+        if "work_me" not in a.concerns:
+            break
+        a.step(Event(kind="neutral",context="none",available_actions=("work",),forced_action="work"))
+    require(t,"ordinary_work_eventually_resolves","work_me" not in a.concerns,a.persistent_snapshot())
+    cue(a,"c_work")
+    require(t,"resolved_commitment_repeated_cue_no_resurrection","work_me" not in a.concerns and "work_me" not in a.prospective_commitments,a.persistent_snapshot())
 
     # Subjective access: only experienced event context triggers.
     a=CapacityThreeProspectiveCharacter(); commit(a,"private","experienced_cue")
