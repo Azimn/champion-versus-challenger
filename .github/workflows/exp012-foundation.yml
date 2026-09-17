@@ -1,0 +1,25 @@
+name: exp012-foundation
+on:
+  push:
+    branches: [exp012-habit-temporal-plasticity]
+    paths:
+      - 'src/lifelike_min/exp012_foundation.py'
+      - '.github/workflows/exp012-foundation.yml'
+permissions: {contents: read}
+jobs:
+  characterize:
+    strategy:
+      matrix:
+        python-version: ['3.11','3.12']
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '${{ matrix.python-version }}'}
+      - run: pip install -e . pytest
+      - run: pytest -q
+      - run: python -m lifelike_min.exp012_foundation --json results/exp012/foundation-${{ matrix.python-version }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exp012-foundation-${{ matrix.python-version }}
+          path: results/exp012/foundation-${{ matrix.python-version }}.json
