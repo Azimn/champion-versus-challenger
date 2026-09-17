@@ -1,0 +1,25 @@
+name: exp012-closeout
+on:
+  push:
+    branches:
+      - exp012-habit-temporal-plasticity
+jobs:
+  closeout:
+    strategy:
+      matrix:
+        python: ["3.11","3.12"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "${{ matrix.python }}"
+      - run: pip install -e . pytest
+      - run: test "$(git hash-object src/lifelike_min/exp012_challenger.py)" = "9c6474de1918b62e827d32deff2fa10a4b2443d1"
+      - run: pytest -q
+      - run: python -m lifelike_min.exp012_foundation --json results/exp012/foundation-${{ matrix.python }}.json
+      - run: python -m lifelike_min.exp012_closeout --json results/exp012/closeout-${{ matrix.python }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exp012-closeout-${{ matrix.python }}
+          path: results/exp012/*.json
