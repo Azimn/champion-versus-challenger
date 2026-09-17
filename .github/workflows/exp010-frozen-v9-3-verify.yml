@@ -1,0 +1,26 @@
+name: exp010-frozen-v9-3-verify
+on:
+  push:
+    branches: [exp010-minimum-information-suppression]
+    paths: ['.github/workflows/exp010-frozen-v9-3-verify.yml']
+  workflow_dispatch:
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: champion-v9-3-concern-capacity-three
+          fetch-depth: 0
+      - name: Verify exact frozen ref
+        run: test "$(git rev-parse HEAD)" = "a10bc27579bf5bd0ff1a90d6ad6e3f337d8ed7bc"
+      - name: Verify evaluated production bytes
+        run: test "$(git show 03baf6bc6f06d3f298701a8ce66c44e00f509d50:src/lifelike_min/exp010_challenger.py | sha256sum | cut -d' ' -f1)" = "$(sha256sum src/lifelike_min/exp010_challenger.py | cut -d' ' -f1)"
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install -e . pytest
+      - run: pytest -q
+      - run: python -m lifelike_min.exp010_evaluation
+      - run: python -m lifelike_min.exp010_review1
+      - run: python -m lifelike_min.exp010_review2
+      - run: python -m lifelike_min.exp010_closeout
