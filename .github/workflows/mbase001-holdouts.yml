@@ -1,0 +1,21 @@
+name: mbase001-holdouts
+on:
+  push:
+    branches: [mbase-001-mechanism-basis-audit]
+    paths: ['src/lifelike_min/mbase001_holdouts.py','.github/workflows/mbase001-holdouts.yml']
+permissions:
+  contents: read
+jobs:
+  holdouts:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: {python-version: '3.12'}
+      - run: pip install -e . pytest
+      - run: pytest -q
+      - run: python -m lifelike_min.mbase001_holdouts --json results/mbase-001/holdouts.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: mbase001-holdouts
+          path: results/mbase-001/holdouts.json
