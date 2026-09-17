@@ -25,9 +25,9 @@ These bounds are local to demonstrated behavior. They are not human capacity est
 - EXP-003: uncertainty-policy correction removed action-order artifacts with no new persistent mechanism.
 - EXP-009: unresolved existence was separated from momentary activation using the existing concern key + scalar representation. Zero new persistent fields and zero new counted mechanisms.
 - EXP-010 did not change semantics. It increased concern capacity from 2 to 3.
-- EXP-011 did not change semantics. It increased prospective capacity from 2 to 3 while retaining the existing identity + future-cue record.
+- EXP-011 did not change semantics. It increased prospective capacity from 2 to 3 while retaining the existing identity + future-cue record.\n- EXP-012 changed habit semantics without adding state: the existing signed habit scalar now encodes current learned support and attenuates multiplicatively by 0.9995 per qualifying processed subject-experienced event.
 
-## Current compact statement after EXP-011
+## Current compact statement after EXP-012
 
 - mechanisms = 11
 - concern capacity = 3
@@ -36,6 +36,13 @@ These bounds are local to demonstrated behavior. They are not human capacity est
 - fresh canonical state = 245 bytes
 - fresh diagnostic state = 269 bytes
 
-The last three promoted behavioral corrections, EXP-009 through EXP-011, added **zero new counted causal mechanisms**. One was semantic and two were bounded-capacity corrections.
+The last four promoted behavioral corrections, EXP-009 through EXP-012, added **zero new counted causal mechanisms**. EXP-009 and EXP-012 were semantic corrections inside existing representations; EXP-010 and EXP-011 were bounded-capacity corrections.
 
 This trajectory is evidence for a locally stabilizing causal basis with still-evolving representational bounds. It does not establish that no future reproduced failure will require a qualitatively new primitive.
+
+
+## EXP-012 computational minimality note
+
+EXP-012 adds zero persistent dimensions but is not computationally free. The current attenuation implementation scans stored habit entries on each processed event, so update work scales O(n) with habit count. This cost is tracked separately from mechanism count and serialized-state dimensionality.
+
+MBASE-001's exact subset result belongs to pre-EXP-012 production semantics. An updated subset-minimality statement requires the post-EXP-012 basis audit.
