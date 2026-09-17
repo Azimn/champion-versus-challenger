@@ -1,0 +1,10 @@
+{
+  "audit":"MBASE-001",
+  "raw_failed_run":35267054601,
+  "failure_classification":"research/reviews/MBASE001_HOLDOUT_PASS1_FAILURE.md",
+  "corrected_run":35267172876,
+  "corrected_artifact":10516803543,
+  "full_v9_3":{"passed":8,"applicable":8,"holdouts":{"concern_pressure":true,"concern_prospective":true,"fact_habit_separation":true,"habit_eligibility":true,"multiprocess_reconstruction":true,"prospective_capacity":true,"relationship_affect":true,"relationship_reliability":true}},
+  "near_minimal":{"minus_affect":{"passed":6,"applicable":7},"minus_partner_reliability":{"passed":6,"applicable":7},"minus_prospective":{"passed":5,"applicable":7},"minus_relationship":{"passed":5,"applicable":7},"minus_competence":{"passed":7,"applicable":7},"minus_fatigue":{"passed":6,"applicable":7}},
+  "interpretation":"No smaller historical-manifest full-coverage subset existed to challenge. The full v9.3 set passed every sealed interaction holdout after two invalid holdout implementation assumptions were preserved and corrected without production or ablation changes. Near-minimal subsets expose additional interaction losses, while minus_competence happens to preserve all seven applicable interaction holdouts but still fails the historically earned competence-pressure capability and therefore is not full coverage."
+}
