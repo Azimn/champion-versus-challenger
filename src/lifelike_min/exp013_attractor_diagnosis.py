@@ -363,6 +363,44 @@ def margin_gate_diagnostic():
     return rows
 
 
+
+def reduced_adaptive_threshold(ticks=20000,decay=.95,pulse=.04,baseline=.10,f0=.25,c0=.15):
+    f,c=f0,c0; threshold=baseline; acts=[]; states=[]
+    for _ in range(ticks):
+        f=max(0.0,min(1.0,f+.04)); c=max(0.0,min(1.0,c+.02))
+        threshold=baseline+(threshold-baseline)*decay
+        ranked=sorted([(f,0,"rest"),(c,-1,"work"),(threshold,-2,"idle")],reverse=True)
+        act=ranked[0][2]
+        if act=="rest":
+            f=max(0.0,f-.45); threshold=min(1.0,threshold+pulse)
+        elif act=="work":
+            c=max(0.0,c-.45); threshold=min(1.0,threshold+pulse)
+        acts.append(act); states.append((f,c,threshold))
+    p,start=detect_period(acts,max_period=2000,min_repeats=12)
+    return {"decay":decay,"pulse":pulse,"period":p,"transient":start,"tail":acts[-120:],
+            "freq":dict(Counter(acts[-5000:])),
+            "threshold_range":[min(x[2] for x in states[-5000:]),max(x[2] for x in states[-5000:])],
+            "bounded":all(0<=x[0]<=1 and 0<=x[1]<=1 and 0<=x[2]<=1 for x in states)}
+
+
+def adaptive_threshold_diagnostic():
+    rows=[]
+    for decay in (.8,.9,.95,.98,.995):
+        for pulse in (.005,.01,.02,.04,.08,.12):
+            ids=Counter(); periods=[]
+            for f0,c0 in itertools.product((0,.1,.25,.5,.75,1.0),repeat=2):
+                r=reduced_adaptive_threshold(20000,decay=decay,pulse=pulse,f0=f0,c0=c0)
+                periods.append(r["period"])
+                seq=tuple(r["tail"][-r["period"]:]) if r["period"] and r["period"]<=len(r["tail"]) else tuple(r["tail"])
+                if seq and r["period"] and r["period"]<=len(r["tail"]):
+                    rots=[seq[i:]+seq[:i] for i in range(len(seq))]; seq=min(rots)
+                ids[(r["period"],seq)]+=1
+            rows.append({"decay":decay,"pulse":pulse,"periods":dict(Counter(str(x) for x in periods)),
+                         "attractor_count":len(ids),
+                         "attractors":[{"period":k[0],"sequence":list(k[1]),"count":v} for k,v in list(ids.items())[:10]]})
+    return rows
+
+
 def run():
     agent,rows,acts,p,start=baseline_trace(5000)
     result={
@@ -382,6 +420,7 @@ def run():
       "affiliation_interaction_diagnostic":affiliation_interaction_diagnostic(),
       "temporal_arbitration_diagnostic":temporal_arbitration_diagnostic(),
       "margin_gate_diagnostic":margin_gate_diagnostic(),
+      "adaptive_threshold_diagnostic":adaptive_threshold_diagnostic(),
       "production_update_order":["tick increment","need/relationship/affect/concern/reliability drift","event integration including EXP-012 habit attenuation","action scoring","deterministic argmax with enumeration tie break","action effects","trace snapshot"],
     }
     result["passed"]=p==6 and result["perceptual"]["externally_observable"]
