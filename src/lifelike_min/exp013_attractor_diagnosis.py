@@ -259,6 +259,36 @@ def candidate_class_diagnostics():
     return rows
 
 
+
+def reduced_affiliation_enabled(ticks=10000,f0=.25,a0=.55,c0=.15):
+    f,a,c=f0,a0,c0; acts=[]; states=[]
+    for _ in range(ticks):
+        f=max(0.0,min(1.0,f+.04)); a=max(0.0,min(1.0,a+.025)); c=max(0.0,min(1.0,c+.02))
+        choices=[(f,0,"rest"),(c,-1,"work"),(a,-2,"seek_connection"),(.10,-3,"idle")]
+        act=max(choices)[2]
+        if act=="rest": f=max(0.0,f-.45)
+        elif act=="work": c=max(0.0,c-.45)
+        elif act=="seek_connection": a=max(0.0,a-.45)
+        acts.append(act); states.append((f,a,c))
+    p,start=detect_period(acts,max_period=500,min_repeats=12)
+    return {"period":p,"transient":start,"tail":acts[-60:],"states_tail":states[-12:],
+            "freq":dict(Counter(acts[-1000:]))}
+
+
+def affiliation_interaction_diagnostic():
+    rows=[]; ids=Counter()
+    for f0,a0,c0 in itertools.product((0,.1,.25,.5,.75,1.0),repeat=3):
+        r=reduced_affiliation_enabled(10000,f0=f0,a0=a0,c0=c0)
+        seq=tuple(r["tail"][-r["period"]:]) if r["period"] else tuple(r["tail"])
+        if seq:
+            rots=[seq[i:]+seq[:i] for i in range(len(seq))]; ident=min(rots)
+        else: ident=()
+        ids[(r["period"],ident)]+=1
+        rows.append({"initial":[f0,a0,c0],"period":r["period"],"transient":r["transient"],"freq":r["freq"]})
+    return {"starts":len(rows),"attractors":[{"period":k[0],"sequence":list(k[1]),"count":v} for k,v in ids.items()],
+            "rows":rows}
+
+
 def run():
     agent,rows,acts,p,start=baseline_trace(5000)
     result={
@@ -275,6 +305,7 @@ def run():
       "running_perturbations":perturb_running(),
       "perceptual":perceptual(),
       "candidate_class_diagnostics":candidate_class_diagnostics(),
+      "affiliation_interaction_diagnostic":affiliation_interaction_diagnostic(),
       "production_update_order":["tick increment","need/relationship/affect/concern/reliability drift","event integration including EXP-012 habit attenuation","action scoring","deterministic argmax with enumeration tie break","action effects","trace snapshot"],
     }
     result["passed"]=p==6 and result["perceptual"]["externally_observable"]
