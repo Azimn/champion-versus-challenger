@@ -330,6 +330,39 @@ def temporal_arbitration_diagnostic():
     return rows
 
 
+
+def reduced_margin_gate(ticks=10000,margin=.03,f0=.25,c0=.15):
+    f,c=f0,c0; acts=[]; states=[]
+    for _ in range(ticks):
+        f=max(0.0,min(1.0,f+.04)); c=max(0.0,min(1.0,c+.02))
+        ranked=sorted([(f,0,"rest"),(c,-1,"work"),(.10,-2,"idle")],reverse=True)
+        winner=ranked[0][2]; gap=ranked[0][0]-ranked[1][0]
+        act=winner if winner=="idle" or gap>=margin else "idle"
+        if act=="rest": f=max(0.0,f-.45)
+        elif act=="work": c=max(0.0,c-.45)
+        acts.append(act); states.append((f,c,gap))
+    p,start=detect_period(acts,max_period=500,min_repeats=12)
+    return {"margin":margin,"period":p,"transient":start,"tail":acts[-60:],"freq":dict(Counter(acts[-1000:])),
+            "bounds":{"f":[min(x[0] for x in states[-1000:]),max(x[0] for x in states[-1000:])],
+                      "c":[min(x[1] for x in states[-1000:]),max(x[1] for x in states[-1000:])]}}
+
+
+def margin_gate_diagnostic():
+    rows=[]
+    for margin in (.005,.01,.015,.02,.025,.03,.04,.05,.08,.12):
+        ids=Counter(); periods=[]
+        for f0,c0 in itertools.product((0,.1,.25,.5,.75,1.0),repeat=2):
+            r=reduced_margin_gate(10000,margin=margin,f0=f0,c0=c0)
+            periods.append(r["period"])
+            seq=tuple(r["tail"][-r["period"]:]) if r["period"] else tuple(r["tail"])
+            if seq:
+                rots=[seq[i:]+seq[:i] for i in range(len(seq))]; seq=min(rots)
+            ids[(r["period"],seq)]+=1
+        rows.append({"margin":margin,"periods":dict(Counter(str(x) for x in periods)),
+                     "attractors":[{"period":k[0],"sequence":list(k[1]),"count":v} for k,v in ids.items()]})
+    return rows
+
+
 def run():
     agent,rows,acts,p,start=baseline_trace(5000)
     result={
@@ -348,6 +381,7 @@ def run():
       "candidate_class_diagnostics":candidate_class_diagnostics(),
       "affiliation_interaction_diagnostic":affiliation_interaction_diagnostic(),
       "temporal_arbitration_diagnostic":temporal_arbitration_diagnostic(),
+      "margin_gate_diagnostic":margin_gate_diagnostic(),
       "production_update_order":["tick increment","need/relationship/affect/concern/reliability drift","event integration including EXP-012 habit attenuation","action scoring","deterministic argmax with enumeration tie break","action effects","trace snapshot"],
     }
     result["passed"]=p==6 and result["perceptual"]["externally_observable"]
