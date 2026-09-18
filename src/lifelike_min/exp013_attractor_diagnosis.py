@@ -273,7 +273,8 @@ def run():
       "parameter_sweep":parameter_sweep(),
       "causal_decomposition":causal_decomposition(),
       "running_perturbations":perturb_running(),
-      "perceptual":perceptual(),\n      "candidate_class_diagnostics":candidate_class_diagnostics(),
+      "perceptual":perceptual(),
+      "candidate_class_diagnostics":candidate_class_diagnostics(),
       "production_update_order":["tick increment","need/relationship/affect/concern/reliability drift","event integration including EXP-012 habit attenuation","action scoring","deterministic argmax with enumeration tie break","action effects","trace snapshot"],
     }
     result["passed"]=p==6 and result["perceptual"]["externally_observable"]
