@@ -1,0 +1,24 @@
+name: exp013-development
+on:
+  push:
+    branches:
+      - exp013-adaptive-mobilization
+jobs:
+  develop:
+    strategy:
+      matrix:
+        python: ["3.11","3.12"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "${{ matrix.python }}"
+      - run: pip install -e . pytest
+      - run: test "$(git show 12a1c4c5cf46c70696bf1077fefbf750b7e66a2a:src/lifelike_min/exp013_challenger.py 2>/dev/null; echo $?)" != "0"
+      - run: pytest -q
+      - run: python -m lifelike_min.exp013_development --json results/exp013/development-${{ matrix.python }}.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: exp013-development-${{ matrix.python }}
+          path: results/exp013/*.json
