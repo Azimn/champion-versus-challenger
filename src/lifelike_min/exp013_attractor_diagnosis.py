@@ -226,6 +226,39 @@ def perceptual():
             "externally_observable":tail==list(("rest","work","idle","rest","idle","idle"))*10}
 
 
+
+def reduced_proportional(ticks=5000,f0=.25,c0=.15,df=.04,dc=.02,rest_fraction=.75,work_fraction=.75,idle=.10):
+    f,c=f0,c0; acts=[]; states=[]
+    for _ in range(ticks):
+        f=max(0.0,min(1.0,f+df)); c=max(0.0,min(1.0,c+dc))
+        act=max([(f,0,"rest"),(c,-1,"work"),(idle,-2,"idle")])[2]
+        if act=="rest": f=f*(1.0-rest_fraction)
+        elif act=="work": c=c*(1.0-work_fraction)
+        acts.append(act); states.append((f,c))
+    p,start=detect_period(acts,max_period=240,min_repeats=12)
+    return {"period":p,"transient":start,"tail":acts[-36:],"state_tail":states[-12:],
+            "bounds":{"f_min":min(x[0] for x in states[-1000:]),"f_max":max(x[0] for x in states[-1000:]),
+                      "c_min":min(x[1] for x in states[-1000:]),"c_max":max(x[1] for x in states[-1000:])}}
+
+
+def candidate_class_diagnostics():
+    rows=[]
+    for frac in (.25,.5,.75,.9):
+        attractors=Counter()
+        periods=[]
+        for f0,c0 in itertools.product((0,.1,.25,.5,.75,1.0),repeat=2):
+            r=reduced_proportional(6000,f0=f0,c0=c0,rest_fraction=frac,work_fraction=frac)
+            periods.append(r["period"])
+            seq=tuple(r["tail"][-r["period"]:]) if r["period"] else tuple(r["tail"])
+            if seq:
+                rots=[seq[i:]+seq[:i] for i in range(len(seq))]; seq=min(rots)
+            attractors[(r["period"],seq)]+=1
+        rows.append({"class":"proportional_relief","relief_fraction":frac,
+                     "periods":dict(Counter(str(x) for x in periods)),
+                     "attractors":[{"period":k[0],"sequence":list(k[1]),"count":v} for k,v in attractors.items()]})
+    return rows
+
+
 def run():
     agent,rows,acts,p,start=baseline_trace(5000)
     result={
@@ -240,7 +273,7 @@ def run():
       "parameter_sweep":parameter_sweep(),
       "causal_decomposition":causal_decomposition(),
       "running_perturbations":perturb_running(),
-      "perceptual":perceptual(),
+      "perceptual":perceptual(),\n      "candidate_class_diagnostics":candidate_class_diagnostics(),
       "production_update_order":["tick increment","need/relationship/affect/concern/reliability drift","event integration including EXP-012 habit attenuation","action scoring","deterministic argmax with enumeration tie break","action effects","trace snapshot"],
     }
     result["passed"]=p==6 and result["perceptual"]["externally_observable"]
