@@ -10,6 +10,7 @@ on:
 
 permissions:
   contents: read
+  actions: read
 
 concurrency:
   group: pema-developmental-world-scientific
@@ -28,6 +29,23 @@ jobs:
             echo "Refusing execution: workflow SHA ${GITHUB_SHA} is not reviewer-approved SHA ${{ inputs.approved_sha }}" >&2
             exit 1
           }
+
+      - name: Refuse duplicate canonical execution
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+          APPROVED_SHA: ${{ inputs.approved_sha }}
+          CURRENT_RUN_ID: ${{ github.run_id }}
+        run: |
+          set -euo pipefail
+          prior_successes="$(gh api --paginate \
+            -H 'Accept: application/vnd.github+json' \
+            "/repos/${GITHUB_REPOSITORY}/actions/workflows/pema-developmental-scientific.yml/runs?event=workflow_dispatch&status=success&per_page=100" \
+            --jq '.workflow_runs[] | select(.head_sha == env.APPROVED_SHA and (.id | tostring) != env.CURRENT_RUN_ID) | .id')"
+          if [ -n "${prior_successes}" ]; then
+            echo "Refusing duplicate canonical execution for ${APPROVED_SHA}. A successful canonical workflow run already exists: ${prior_successes}" >&2
+            exit 1
+          fi
 
       - name: Check out exact execution commit
         uses: actions/checkout@v4
