@@ -1,9 +1,4 @@
-"""Frozen execution harness for the preregistered PEMA developmental experiment.
-
-This runner does not define scientific semantics. It executes the frozen implementation
-and writes per-seed artifacts before computing an aggregate manifest. Run only after
-the exact repository head has passed research-guard and preregistration review.
-"""
+"""Frozen execution harness for the preregistered PEMA developmental experiment."""
 from __future__ import annotations
 
 import argparse
@@ -16,6 +11,7 @@ from typing import Any
 from cvc_research.experiments.information_asymmetry.developmental_experiment import (
     GENERATED_CONDITIONS,
     run_condition,
+    summarize_blocks,
 )
 from cvc_research.experiments.information_asymmetry.developmental_world import (
     DEVELOPMENT_TICKS,
@@ -24,7 +20,9 @@ from cvc_research.experiments.information_asymmetry.developmental_world import (
     serialize_history,
 )
 from cvc_research.experiments.information_asymmetry.mature_probe import (
+    develop_mature_runtime_with_result,
     run_development_and_probe,
+    run_mature_probe,
 )
 
 REVIEWED_SCIENTIFIC_BASELINE = "282fd73d10660f66352afe36e5f48a20b74dc9af"
@@ -67,10 +65,13 @@ def paired_history_hash(seed: int) -> str:
 
 
 def run_one(seed: int, condition: str) -> dict[str, Any]:
-    developmental = run_condition(seed, condition, retain_trace=False)
+    """Develop one lifetime exactly once, then probe that exact mature runtime."""
+    mature, developmental = develop_mature_runtime_with_result(seed, condition, retain_trace=True)
     if not conservation_ok(developmental):
         raise RuntimeError(f"developmental conservation failed: {seed} {condition}")
-    probe = run_development_and_probe(seed, condition)
+    timeline = developmental["timeline"]
+    blocks = summarize_blocks(timeline)
+    probe = run_mature_probe(mature)
     probe_conservation = probe["probe_resource_conservation"]
     if abs(float(probe_conservation["error"])) > 1e-9:
         raise RuntimeError(f"probe conservation failed: {seed} {condition}")
@@ -79,17 +80,13 @@ def run_one(seed: int, condition: str) -> dict[str, Any]:
         "condition": condition,
         "development_ticks": DEVELOPMENT_TICKS,
         "history_sha256": None if condition == "REPEATED_DIFFERENTIAL" else paired_history_hash(seed),
-        "developmental_blocks": developmental["developmental_blocks"],
+        "developmental_blocks": blocks,
         "development_endpoint": {
-            key: developmental[key]
-            for key in (
-                "exploration_evidence",
-                "routine_evidence",
-                "concern_reserve",
-                "concern_recalls",
-                "resource_conservation",
-            )
-            if key in developmental
+            "exploration_evidence": timeline[-1]["exploration_evidence"],
+            "routine_evidence": timeline[-1]["routine_evidence"],
+            "concern_reserve": timeline[-1]["concern_reserve"],
+            "concern_recalls": timeline[-1]["concern_recalls"],
+            "resource_conservation": developmental["resource_conservation"],
         },
         "probe": probe,
     }
@@ -108,14 +105,7 @@ def identical_history_gate() -> dict[str, Any]:
     second_probe_hash = digest(second_probe)
     if first_probe_hash != second_probe_hash:
         raise RuntimeError("identical-history mature probe signatures/traces differ")
-    return {
-        "seed": IDENTICAL_HISTORY_SEED,
-        "developmental_trace_sha256": first_hash,
-        "replicate_developmental_trace_sha256": second_hash,
-        "probe_sha256": first_probe_hash,
-        "replicate_probe_sha256": second_probe_hash,
-        "exact_match": True,
-    }
+    return {"seed": IDENTICAL_HISTORY_SEED, "developmental_trace_sha256": first_hash, "replicate_developmental_trace_sha256": second_hash, "probe_sha256": first_probe_hash, "replicate_probe_sha256": second_probe_hash, "exact_match": True}
 
 
 def main() -> None:
@@ -124,21 +114,11 @@ def main() -> None:
     args = parser.parse_args()
     output: Path = args.output
     output.mkdir(parents=True, exist_ok=True)
-
     head = git_head()
-    provenance = {
-        "execution_commit": head,
-        "reviewed_scientific_baseline": REVIEWED_SCIENTIFIC_BASELINE,
-        "world_seeds": list(WORLD_SEEDS),
-        "conditions": list(CONDITIONS),
-        "development_ticks": DEVELOPMENT_TICKS,
-        "identical_history_seed": IDENTICAL_HISTORY_SEED,
-    }
+    provenance = {"execution_commit": head, "reviewed_scientific_baseline": REVIEWED_SCIENTIFIC_BASELINE, "world_seeds": list(WORLD_SEEDS), "conditions": list(CONDITIONS), "development_ticks": DEVELOPMENT_TICKS, "identical_history_seed": IDENTICAL_HISTORY_SEED}
     write_json(output / "provenance.json", provenance)
-
     history_hashes = {str(seed): paired_history_hash(seed) for seed in WORLD_SEEDS}
     write_json(output / "history_hashes.json", history_hashes)
-
     artifact_index: list[dict[str, Any]] = []
     for seed in WORLD_SEEDS:
         expected_history = history_hashes[str(seed)]
@@ -148,23 +128,11 @@ def main() -> None:
                 raise RuntimeError(f"paired history mismatch: {seed} {condition}")
             relative = Path("per_seed") / str(seed) / f"{condition}.json"
             write_json(output / relative, result)
-            artifact_index.append({
-                "seed": seed,
-                "condition": condition,
-                "path": relative.as_posix(),
-                "sha256": digest(result),
-            })
-
+            artifact_index.append({"seed": seed, "condition": condition, "path": relative.as_posix(), "sha256": digest(result)})
     replicate = identical_history_gate()
     write_json(output / "identical_history_replicate.json", replicate)
     write_json(output / "artifact_index.json", artifact_index)
-    manifest = {
-        "provenance": provenance,
-        "per_seed_artifact_count": len(artifact_index),
-        "identical_history": replicate,
-        "artifact_index_sha256": digest(artifact_index),
-        "status": "execution_complete_uninterpreted",
-    }
+    manifest = {"provenance": provenance, "per_seed_artifact_count": len(artifact_index), "identical_history": replicate, "artifact_index_sha256": digest(artifact_index), "status": "execution_complete_uninterpreted"}
     write_json(output / "manifest.json", manifest)
 
 
