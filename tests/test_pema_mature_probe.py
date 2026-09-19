@@ -69,6 +69,16 @@ class MatureProbeTests(unittest.TestCase):
         self.assertEqual(frozen.propose(16, config), inherited.propose(16, config))
         self.assertEqual(frozen.propose(16, config)[0].kind, "RECALL")
 
+    def test_probe_resource_accounting_conserves_with_mature_reserve_as_carry_in(self):
+        result = run_mature_probe(self._small_mature_runtime())
+        conservation = result["probe_resource_conservation"]
+        self.assertAlmostEqual(conservation["error"], 0.0, places=9)
+        self.assertEqual(
+            conservation["initial_reserve"],
+            result["frozen_learning_state"]["concern_reserve"],
+        )
+        self.assertEqual(conservation["initial_reserve"], conservation["final_reserve"])
+
     def test_probe_uses_fresh_held_out_event_namespace(self):
         result = run_mature_probe(self._small_mature_runtime())
         probe_behaviors = result["behaviors"]

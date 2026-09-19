@@ -96,6 +96,48 @@ def _learning_state(runtime: IntegratedPEMARuntime) -> dict[str, float]:
     }
 
 
+def _resource_accounting_state(runtime: IntegratedPEMARuntime) -> dict[str, float]:
+    return {
+        "processing_spent": float(runtime.processing_spent),
+        "conversion_loss": float(runtime.conversion_loss),
+        "expired_unused": float(runtime.expired_unused),
+        "reserve": float(runtime.concern.reserve),
+        "reserve_consumed": float(runtime.concern.reserve_consumed),
+    }
+
+
+def _probe_resource_conservation(
+    before: dict[str, float],
+    after: dict[str, float],
+    *,
+    capacity_per_tick: int,
+) -> dict[str, float]:
+    supplied = float(PROBE_TICKS * capacity_per_tick)
+    processing = after["processing_spent"] - before["processing_spent"]
+    conversion_loss = after["conversion_loss"] - before["conversion_loss"]
+    expired_unused = after["expired_unused"] - before["expired_unused"]
+    reserve_consumed = after["reserve_consumed"] - before["reserve_consumed"]
+    initial_reserve = before["reserve"]
+    final_reserve = after["reserve"]
+    error = (supplied + initial_reserve) - (
+        processing
+        + conversion_loss
+        + expired_unused
+        + reserve_consumed
+        + final_reserve
+    )
+    return {
+        "supplied": supplied,
+        "initial_reserve": initial_reserve,
+        "processing_spent": processing,
+        "conversion_loss": conversion_loss,
+        "expired_unused": expired_unused,
+        "reserve_consumed": reserve_consumed,
+        "final_reserve": final_reserve,
+        "error": error,
+    }
+
+
 def _allocation_by_epoch(timeline: list[dict[str, Any]]) -> list[dict[str, float]]:
     rows: list[dict[str, float]] = []
     for epoch in range(PROBE_EPOCHS):
@@ -134,11 +176,20 @@ def run_mature_probe(mature: IntegratedPEMARuntime) -> dict[str, Any]:
         bank_conversion=0.0,
     )
     before = _learning_state(probe)
+    resource_before = _resource_accounting_state(probe)
     behavior_start = len(probe.action.behaviors)
     result = probe.run(retain_trace=True)
     after = _learning_state(probe)
+    resource_after = _resource_accounting_state(probe)
+    conservation = _probe_resource_conservation(
+        resource_before,
+        resource_after,
+        capacity_per_tick=probe.config.capacity_per_tick,
+    )
     if before != after:
         raise RuntimeError("mature probe mutated frozen learning-relevant state")
+    if abs(conservation["error"]) > 1e-9:
+        raise RuntimeError("mature probe violated probe-local resource conservation")
 
     behaviors = probe.action.behaviors[behavior_start:]
     if len(behaviors) != PROBE_EPOCHS:
@@ -153,6 +204,7 @@ def run_mature_probe(mature: IntegratedPEMARuntime) -> dict[str, Any]:
         "allocation_shares": _allocation_by_epoch(timeline),
         "frozen_learning_state": before,
         "learning_state_after_probe": after,
+        "probe_resource_conservation": conservation,
         "timeline": timeline,
     }
 
