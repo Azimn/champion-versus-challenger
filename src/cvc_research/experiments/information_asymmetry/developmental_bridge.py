@@ -20,9 +20,18 @@ class DevelopmentalRuntimeInput:
 
 
 def to_world_event(event: DevelopmentalEvent) -> WorldEvent:
-    """Translate generator transport semantics without adding cognition."""
+    """Translate generator transport semantics into the inherited runtime vocabulary.
+
+    The integrated Action actor recognizes the existing ``E{cycle}_PUBLIC`` and
+    ``E{cycle}_PRIVATE`` transport identifiers. The generator uses ``G`` IDs to
+    keep generated histories visibly distinct on disk, so the bridge performs
+    this deterministic namespace translation without changing channel, value,
+    salience, timing, or actor-local cognition.
+    """
+    if event.role not in {"PRIVATE", "PUBLIC"}:
+        raise ValueError(f"unsupported developmental event role: {event.role}")
     return WorldEvent(
-        event_id=event.event_id,
+        event_id=f"E{event.epoch}_{event.role}",
         cycle=event.epoch,
         channel=event.channel,
         value=event.value,
@@ -42,16 +51,21 @@ def build_runtime_input(
         raise ValueError("developmental history must not be empty")
 
     previous_tick = -1
-    ids: set[str] = set()
+    source_ids: set[str] = set()
+    runtime_ids: set[str] = set()
     converted: list[WorldEvent] = []
     for event in materialized:
-        if event.event_id in ids:
+        if event.event_id in source_ids:
             raise ValueError(f"duplicate event id: {event.event_id}")
         if event.born_tick < previous_tick:
             raise ValueError("developmental history must be ordered by born_tick")
-        ids.add(event.event_id)
+        source_ids.add(event.event_id)
         previous_tick = event.born_tick
-        converted.append(to_world_event(event))
+        bridged = to_world_event(event)
+        if bridged.event_id in runtime_ids:
+            raise ValueError(f"duplicate runtime event id: {bridged.event_id}")
+        runtime_ids.add(bridged.event_id)
+        converted.append(bridged)
 
     final_tick = max(event.born_tick for event in materialized)
     full_epoch_duration = (max(event.epoch for event in materialized) + 1) * EPOCH_TICKS
