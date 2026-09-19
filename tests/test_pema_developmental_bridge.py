@@ -15,10 +15,10 @@ from cvc_research.experiments.information_asymmetry.integrated_runtime import In
 
 
 class DevelopmentalBridgeTests(unittest.TestCase):
-    def test_bridge_preserves_transport_semantics_exactly(self) -> None:
+    def test_bridge_preserves_transport_semantics_and_maps_runtime_namespace(self) -> None:
         event = generate_history(WORLD_SEEDS[0], epochs=1)[0]
         bridged = to_world_event(event)
-        self.assertEqual(bridged.event_id, event.event_id)
+        self.assertEqual(bridged.event_id, f"E{event.epoch}_{event.role}")
         self.assertEqual(bridged.cycle, event.epoch)
         self.assertEqual(bridged.channel, event.channel)
         self.assertEqual(bridged.value, event.value)
