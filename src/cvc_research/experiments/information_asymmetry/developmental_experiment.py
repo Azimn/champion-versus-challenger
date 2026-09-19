@@ -5,7 +5,12 @@ from typing import Any
 
 from .developmental_bridge import build_runtime_input
 from .developmental_runtime import run_developmental
-from .developmental_world import DEVELOPMENT_TICKS, WORLD_SEEDS, generate_history
+from .developmental_world import (
+    DEVELOPMENT_TICKS,
+    WORLD_SEEDS,
+    generate_history,
+    serialize_history,
+)
 from .integrated_runtime import IntegratedConfig, run_integrated
 
 
@@ -74,8 +79,8 @@ def run_condition(seed: int, condition: str, *, retain_trace: bool = False) -> d
         history_json = None
     else:
         history = generate_history(seed)
-        history_json = history.to_json()
-        runtime_input = build_runtime_input(history.events, config=config)
+        history_json = serialize_history(history)
+        runtime_input = build_runtime_input(history, config=config)
         result = run_developmental(runtime_input, retain_trace=True)
 
     timeline = result["timeline"]
