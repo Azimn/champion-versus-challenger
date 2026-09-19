@@ -3,7 +3,7 @@ from __future__ import annotations
 from dataclasses import dataclass
 from typing import Iterable
 
-from .developmental_world import DevelopmentalEvent
+from .developmental_world import DevelopmentalEvent, EPOCH_TICKS
 from .integrated_runtime import IntegratedConfig, WorldEvent
 
 
@@ -53,8 +53,10 @@ def build_runtime_input(
         previous_tick = event.born_tick
         converted.append(to_world_event(event))
 
-    runtime_config = config or IntegratedConfig(ticks=max(event.born_tick for event in materialized) + 1)
-    if runtime_config.ticks <= max(event.born_tick for event in materialized):
+    final_tick = max(event.born_tick for event in materialized)
+    full_epoch_duration = (max(event.epoch for event in materialized) + 1) * EPOCH_TICKS
+    runtime_config = config or IntegratedConfig(ticks=full_epoch_duration)
+    if runtime_config.ticks <= final_tick:
         raise ValueError("runtime config ends before the final developmental event")
 
     return DevelopmentalRuntimeInput(config=runtime_config, events=tuple(converted))
