@@ -6,6 +6,7 @@ from cvc_research.experiments.information_asymmetry.developmental_experiment imp
     BLOCK_COUNT,
     BLOCK_TICKS,
     GENERATED_CONDITIONS,
+    RUNTIME_SEED,
     condition_config,
     summarize_blocks,
 )
@@ -31,6 +32,19 @@ class DevelopmentalExperimentTests(unittest.TestCase):
         self.assertEqual(no_feedback, baseline.__class__(**{**baseline.__dict__, "feedback_enabled": False}))
         self.assertEqual(no_reserve, baseline.__class__(**{**baseline.__dict__, "reserve_enabled": False}))
         self.assertEqual(global_access, baseline.__class__(**{**baseline.__dict__, "access": "global"}))
+
+    def test_world_seed_is_separate_from_fixed_runtime_tiebreak_seed(self) -> None:
+        configs = [
+            condition_config(seed, "GENERATIVE_DIFFERENTIAL")
+            for seed in WORLD_SEEDS
+        ]
+        self.assertTrue(all(config.seed == RUNTIME_SEED for config in configs))
+        self.assertEqual(RUNTIME_SEED, 0)
+        repeated = [
+            condition_config(seed, "REPEATED_DIFFERENTIAL")
+            for seed in WORLD_SEEDS
+        ]
+        self.assertTrue(all(config == repeated[0] for config in repeated))
 
     def test_all_generated_conditions_reuse_byte_identical_history(self) -> None:
         seed = WORLD_SEEDS[0]

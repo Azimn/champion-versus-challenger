@@ -22,6 +22,7 @@ GENERATED_CONDITIONS = {
 }
 BLOCK_TICKS = 4_000
 BLOCK_COUNT = DEVELOPMENT_TICKS // BLOCK_TICKS
+RUNTIME_SEED = 0
 
 
 def condition_config(seed: int, condition: str) -> IntegratedConfig:
@@ -29,10 +30,10 @@ def condition_config(seed: int, condition: str) -> IntegratedConfig:
     if seed not in WORLD_SEEDS:
         raise ValueError(f"seed {seed} is not preregistered")
     if condition == "REPEATED_DIFFERENTIAL":
-        return IntegratedConfig(ticks=DEVELOPMENT_TICKS, seed=seed)
+        return IntegratedConfig(ticks=DEVELOPMENT_TICKS, seed=RUNTIME_SEED)
     if condition not in GENERATED_CONDITIONS:
         raise ValueError(f"unknown developmental condition: {condition}")
-    base = IntegratedConfig(ticks=DEVELOPMENT_TICKS, seed=seed)
+    base = IntegratedConfig(ticks=DEVELOPMENT_TICKS, seed=RUNTIME_SEED)
     return replace(base, **GENERATED_CONDITIONS[condition])
 
 
