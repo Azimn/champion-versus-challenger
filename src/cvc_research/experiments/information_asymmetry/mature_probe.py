@@ -94,6 +94,11 @@ def run_mature_probe(mature: IntegratedPEMARuntime) -> dict[str, Any]:
     probe.__class__ = MatureProbeRuntime
     probe.concern.__class__ = FrozenProbeConcernActor
     probe.config = replace(probe.config, ticks=PROBE_TICKS, feedback_enabled=False, bank_conversion=0.0)
+    # Development may retain a 24,000-tick trace on the mature runtime. The
+    # probe runs on a deepcopy, so reset only this observational buffer before
+    # evaluation. This keeps the probe artifact scoped to its own 240 ticks
+    # without changing any cognitive, learned, or resource-accounting state.
+    probe.tick_records = []
     before = _learning_state(probe)
     resource_before = _resource_accounting_state(probe)
     behavior_start = len(probe.action.behaviors)
