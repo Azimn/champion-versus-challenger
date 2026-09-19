@@ -1,0 +1,76 @@
+name: pema-developmental-scientific
+
+on:
+  workflow_dispatch:
+    inputs:
+      approved_sha:
+        description: Exact PR head SHA explicitly approved by the independent scientific reviewer
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+concurrency:
+  group: pema-developmental-world-scientific
+  cancel-in-progress: false
+
+jobs:
+  execute:
+    runs-on: ubuntu-latest
+    timeout-minutes: 180
+    steps:
+      - name: Require exact reviewed commit
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "${GITHUB_SHA}" = "${{ inputs.approved_sha }}" || {
+            echo "Refusing execution: workflow SHA ${GITHUB_SHA} is not reviewer-approved SHA ${{ inputs.approved_sha }}" >&2
+            exit 1
+          }
+
+      - name: Check out exact execution commit
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ inputs.approved_sha }}
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install frozen harness
+        run: python -m pip install -e .
+
+      - name: Re-run deterministic gates on execution SHA
+        run: |
+          python -m unittest discover -s tests -v
+          cvc-validate-state .
+
+      - name: Verify checked-out SHA
+        shell: bash
+        run: |
+          set -euo pipefail
+          test "$(git rev-parse HEAD)" = "${{ inputs.approved_sha }}"
+
+      - name: Execute preregistered PEMA developmental experiment
+        run: |
+          python research/experiments/pema-developmental-world/run_scientific.py \
+            --output artifacts/pema-developmental-world
+
+      - name: Record immutable artifact checksums
+        shell: bash
+        run: |
+          set -euo pipefail
+          cd artifacts/pema-developmental-world
+          find . -type f ! -name SHA256SUMS -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS
+          sha256sum -c SHA256SUMS
+
+      - name: Upload complete scientific artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: pema-developmental-world-${{ inputs.approved_sha }}-${{ github.run_id }}
+          path: artifacts/pema-developmental-world/
+          if-no-files-found: error
+          retention-days: 90
+          compression-level: 6
