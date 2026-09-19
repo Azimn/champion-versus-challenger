@@ -26,12 +26,18 @@ PROBE_CYCLE_OFFSET = DEVELOPMENT_TICKS // PROBE_EPOCH_TICKS
 class FrozenProbeConcernActor(ConcernActor):
     """Concern actor with mature reserve held fixed during evaluation.
 
-    The inherited proposal rule still reads the mature reserve and therefore keeps
-    its causal effect on operation priority. A granted probe recall records the
-    recall and emits the same explicit MEMORY effect, but it cannot consume reserve.
-    This is the minimum evaluation-only change required by the frozen protocol's
-    non-learning probe contract.
+    Probe-time banking is suppressed entirely. When the held-out context matches,
+    the inherited recall proposal rule still reads the mature reserve and therefore
+    keeps its causal effect on operation priority. A granted probe recall records
+    the recall and emits the same explicit MEMORY effect, but it cannot consume
+    reserve. This is the minimum evaluation-only change required by the frozen
+    protocol's non-learning probe contract.
     """
+
+    def propose(self, tick: int, config) -> list[Operation]:
+        if not self.context_match:
+            return []
+        return super().propose(tick, config)
 
     def execute(self, operation: Operation, tick: int, config) -> list[Effect]:
         if operation.kind == "RECALL":
@@ -114,9 +120,9 @@ def run_mature_probe(mature: IntegratedPEMARuntime) -> dict[str, Any]:
     """Evaluate a completed developmental runtime without learning.
 
     The completed runtime is never mutated. A deep copy receives the six frozen
-    40-tick probe epochs. Feedback is disabled, reserve conversion is zero, and
-    probe recall cannot consume reserve, so mature evidence and reserve remain
-    fixed while continuing to affect operation demand.
+    40-tick probe epochs. Feedback is disabled, reserve-banking proposals are
+    suppressed, and probe recall cannot consume reserve, so mature evidence and
+    reserve remain fixed while continuing to affect operation demand.
     """
     probe = deepcopy(mature)
     probe.__class__ = MatureProbeRuntime

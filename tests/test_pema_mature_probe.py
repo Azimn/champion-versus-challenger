@@ -7,9 +7,10 @@ from cvc_research.experiments.information_asymmetry.mature_probe import (
     PROBE_CYCLE_OFFSET,
     PROBE_EPOCHS,
     PROBE_TICKS,
+    FrozenProbeConcernActor,
     run_mature_probe,
 )
-from cvc_research.experiments.information_asymmetry.integrated_runtime import IntegratedConfig
+from cvc_research.experiments.information_asymmetry.integrated_runtime import ConcernActor, IntegratedConfig
 
 
 class MatureProbeTests(unittest.TestCase):
@@ -48,6 +49,25 @@ class MatureProbeTests(unittest.TestCase):
     def test_probe_learning_state_is_frozen(self):
         result = run_mature_probe(self._small_mature_runtime())
         self.assertEqual(result["frozen_learning_state"], result["learning_state_after_probe"])
+
+    def test_probe_suppresses_reserve_banking_operations(self):
+        result = run_mature_probe(self._small_mature_runtime())
+        granted_kinds = [
+            grant["kind"]
+            for row in result["timeline"]
+            for grant in row["granted"]
+        ]
+        self.assertNotIn("BANK_RESERVE", granted_kinds)
+
+    def test_probe_recall_proposal_preserves_inherited_mature_reserve_priority(self):
+        config = IntegratedConfig()
+        frozen = FrozenProbeConcernActor()
+        inherited = ConcernActor()
+        for actor in (frozen, inherited):
+            actor.reserve = 1.25
+            actor.set_context_match(True)
+        self.assertEqual(frozen.propose(16, config), inherited.propose(16, config))
+        self.assertEqual(frozen.propose(16, config)[0].kind, "RECALL")
 
     def test_probe_uses_fresh_held_out_event_namespace(self):
         result = run_mature_probe(self._small_mature_runtime())
