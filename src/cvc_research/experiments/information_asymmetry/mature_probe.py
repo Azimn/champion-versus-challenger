@@ -16,7 +16,6 @@ from .integrated_runtime import (
     WorldEvent,
 )
 
-
 PROBE_EPOCHS = 6
 PROBE_EPOCH_TICKS = 40
 PROBE_TICKS = PROBE_EPOCHS * PROBE_EPOCH_TICKS
@@ -24,15 +23,7 @@ PROBE_CYCLE_OFFSET = DEVELOPMENT_TICKS // PROBE_EPOCH_TICKS
 
 
 class FrozenProbeConcernActor(ConcernActor):
-    """Concern actor with mature reserve held fixed during evaluation.
-
-    Probe-time banking is suppressed entirely. When the held-out context matches,
-    the inherited recall proposal rule still reads the mature reserve and therefore
-    keeps its causal effect on operation priority. A granted probe recall records
-    the recall and emits the same explicit MEMORY effect, but it cannot consume
-    reserve. This is the minimum evaluation-only change required by the frozen
-    protocol's non-learning probe contract.
-    """
+    """Concern actor with mature reserve held fixed during evaluation."""
 
     def propose(self, tick: int, config) -> list[Operation]:
         if not self.context_match:
@@ -47,71 +38,30 @@ class FrozenProbeConcernActor(ConcernActor):
 
 
 class MatureProbeRuntime(IntegratedPEMARuntime):
-    """A mature PEMA state exposed to the inherited controlled social probe.
-
-    Instances are created only by deep-copying a completed developmental runtime.
-    The probe uses fresh event identifiers beyond the developmental cycle range and
-    disables evidence acquisition and reserve banking while retaining their mature
-    values as causal inputs to operation demand.
-    """
+    """A mature PEMA state exposed to the inherited controlled social probe."""
 
     def _world_step(self, tick: int) -> None:
         local_cycle = (tick - 1) // PROBE_EPOCH_TICKS
         cycle = PROBE_CYCLE_OFFSET + local_cycle
         position = (tick - 1) % PROBE_EPOCH_TICKS
         if position == 0:
-            self.perception.observe(
-                WorldEvent(
-                    event_id=f"E{cycle}_PRIVATE",
-                    cycle=cycle,
-                    channel="private",
-                    value="avoid",
-                    salience=0.72,
-                    born_tick=tick,
-                ),
-                self.config,
-            )
+            self.perception.observe(WorldEvent(event_id=f"E{cycle}_PRIVATE", cycle=cycle, channel="private", value="avoid", salience=0.72, born_tick=tick), self.config)
         if position == 5:
-            self.perception.observe(
-                WorldEvent(
-                    event_id=f"E{cycle}_PUBLIC",
-                    cycle=cycle,
-                    channel="public",
-                    value="welcome",
-                    salience=0.86,
-                    born_tick=tick,
-                ),
-                self.config,
-            )
+            self.perception.observe(WorldEvent(event_id=f"E{cycle}_PUBLIC", cycle=cycle, channel="public", value="welcome", salience=0.86, born_tick=tick), self.config)
         if position == 6:
             self.action.start_decision(f"PROBE_D{local_cycle}", cycle, tick)
         self.concern.set_context_match(position == 15)
 
 
 def _learning_state(runtime: IntegratedPEMARuntime) -> dict[str, float]:
-    return {
-        "exploration_evidence": float(runtime.exploration.evidence),
-        "routine_evidence": float(runtime.routine.evidence),
-        "concern_reserve": float(runtime.concern.reserve),
-    }
+    return {"exploration_evidence": float(runtime.exploration.evidence), "routine_evidence": float(runtime.routine.evidence), "concern_reserve": float(runtime.concern.reserve)}
 
 
 def _resource_accounting_state(runtime: IntegratedPEMARuntime) -> dict[str, float]:
-    return {
-        "processing_spent": float(runtime.processing_spent),
-        "conversion_loss": float(runtime.conversion_loss),
-        "expired_unused": float(runtime.expired_unused),
-        "reserve": float(runtime.concern.reserve),
-        "reserve_consumed": float(runtime.concern.reserve_consumed),
-    }
+    return {"processing_spent": float(runtime.processing_spent), "conversion_loss": float(runtime.conversion_loss), "expired_unused": float(runtime.expired_unused), "reserve": float(runtime.concern.reserve), "reserve_consumed": float(runtime.concern.reserve_consumed)}
 
 
-def _probe_resource_conservation(
-    before: dict[str, float],
-    after: dict[str, float],
-    *,
-    capacity_per_tick: int,
-) -> dict[str, float]:
+def _probe_resource_conservation(before: dict[str, float], after: dict[str, float], *, capacity_per_tick: int) -> dict[str, float]:
     supplied = float(PROBE_TICKS * capacity_per_tick)
     processing = after["processing_spent"] - before["processing_spent"]
     conversion_loss = after["conversion_loss"] - before["conversion_loss"]
@@ -119,23 +69,8 @@ def _probe_resource_conservation(
     reserve_consumed = after["reserve_consumed"] - before["reserve_consumed"]
     initial_reserve = before["reserve"]
     final_reserve = after["reserve"]
-    error = (supplied + initial_reserve) - (
-        processing
-        + conversion_loss
-        + expired_unused
-        + reserve_consumed
-        + final_reserve
-    )
-    return {
-        "supplied": supplied,
-        "initial_reserve": initial_reserve,
-        "processing_spent": processing,
-        "conversion_loss": conversion_loss,
-        "expired_unused": expired_unused,
-        "reserve_consumed": reserve_consumed,
-        "final_reserve": final_reserve,
-        "error": error,
-    }
+    error = (supplied + initial_reserve) - (processing + conversion_loss + expired_unused + reserve_consumed + final_reserve)
+    return {"supplied": supplied, "initial_reserve": initial_reserve, "processing_spent": processing, "conversion_loss": conversion_loss, "expired_unused": expired_unused, "reserve_consumed": reserve_consumed, "final_reserve": final_reserve, "error": error}
 
 
 def _allocation_by_epoch(timeline: list[dict[str, Any]]) -> list[dict[str, float]]:
@@ -149,75 +84,50 @@ def _allocation_by_epoch(timeline: list[dict[str, Any]]) -> list[dict[str, float
                 if actor_id in counts:
                     counts[actor_id] += 1
         total = sum(counts.values())
-        rows.append(
-            {
-                actor_id: (count / total if total else 0.0)
-                for actor_id, count in counts.items()
-            }
-        )
+        rows.append({actor_id: (count / total if total else 0.0) for actor_id, count in counts.items()})
     return rows
 
 
 def run_mature_probe(mature: IntegratedPEMARuntime) -> dict[str, Any]:
-    """Evaluate a completed developmental runtime without learning.
-
-    The completed runtime is never mutated. A deep copy receives the six frozen
-    40-tick probe epochs. Feedback is disabled, reserve-banking proposals are
-    suppressed, and probe recall cannot consume reserve, so mature evidence and
-    reserve remain fixed while continuing to affect operation demand.
-    """
+    """Evaluate a completed developmental runtime without learning or mutating it."""
     probe = deepcopy(mature)
     probe.__class__ = MatureProbeRuntime
     probe.concern.__class__ = FrozenProbeConcernActor
-    probe.config = replace(
-        probe.config,
-        ticks=PROBE_TICKS,
-        feedback_enabled=False,
-        bank_conversion=0.0,
-    )
+    probe.config = replace(probe.config, ticks=PROBE_TICKS, feedback_enabled=False, bank_conversion=0.0)
     before = _learning_state(probe)
     resource_before = _resource_accounting_state(probe)
     behavior_start = len(probe.action.behaviors)
     result = probe.run(retain_trace=True)
     after = _learning_state(probe)
     resource_after = _resource_accounting_state(probe)
-    conservation = _probe_resource_conservation(
-        resource_before,
-        resource_after,
-        capacity_per_tick=probe.config.capacity_per_tick,
-    )
+    conservation = _probe_resource_conservation(resource_before, resource_after, capacity_per_tick=probe.config.capacity_per_tick)
     if before != after:
         raise RuntimeError("mature probe mutated frozen learning-relevant state")
     if abs(conservation["error"]) > 1e-9:
         raise RuntimeError("mature probe violated probe-local resource conservation")
-
     behaviors = probe.action.behaviors[behavior_start:]
     if len(behaviors) != PROBE_EPOCHS:
         raise RuntimeError("mature probe did not produce exactly six decisions")
     timeline = result["timeline"]
     if len(timeline) != PROBE_TICKS:
         raise RuntimeError("mature probe did not execute exactly 240 ticks")
-
-    return {
-        "decision_signature": [row["choice"] for row in behaviors],
-        "behaviors": behaviors,
-        "allocation_shares": _allocation_by_epoch(timeline),
-        "frozen_learning_state": before,
-        "learning_state_after_probe": after,
-        "probe_resource_conservation": conservation,
-        "timeline": timeline,
-    }
+    return {"decision_signature": [row["choice"] for row in behaviors], "behaviors": behaviors, "allocation_shares": _allocation_by_epoch(timeline), "frozen_learning_state": before, "learning_state_after_probe": after, "probe_resource_conservation": conservation, "timeline": timeline}
 
 
-def develop_mature_runtime(seed: int, condition: str) -> IntegratedPEMARuntime:
-    """Create one isolated mature runtime under a preregistered condition."""
+def develop_mature_runtime_with_result(seed: int, condition: str, *, retain_trace: bool = False) -> tuple[IntegratedPEMARuntime, dict[str, Any]]:
+    """Execute exactly one isolated developmental lifetime and return that runtime and result."""
     config = condition_config(seed, condition)
     if condition == "REPEATED_DIFFERENTIAL":
         runtime: IntegratedPEMARuntime = IntegratedPEMARuntime(config)
     else:
         history = generate_history(seed)
         runtime = DevelopmentalPEMARuntime(build_runtime_input(history, config=config))
-    runtime.run(retain_trace=False)
+    result = runtime.run(retain_trace=retain_trace)
+    return runtime, result
+
+
+def develop_mature_runtime(seed: int, condition: str) -> IntegratedPEMARuntime:
+    runtime, _ = develop_mature_runtime_with_result(seed, condition, retain_trace=False)
     return runtime
 
 
