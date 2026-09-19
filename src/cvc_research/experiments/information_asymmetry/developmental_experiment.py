@@ -52,6 +52,8 @@ def summarize_blocks(timeline: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 if actor_id in grants:
                     grants[actor_id] += 1
         channel_total = grants["EXPLORATION"] + grants["ROUTINE"]
+        recall_start = timeline[start - 1]["concern_recalls"] if start else 0
+        recall_end = rows[-1]["concern_recalls"]
         blocks.append(
             {
                 "block": block_index + 1,
@@ -62,7 +64,8 @@ def summarize_blocks(timeline: list[dict[str, Any]]) -> list[dict[str, Any]]:
                 "final_exploration_evidence": rows[-1]["exploration_evidence"],
                 "final_routine_evidence": rows[-1]["routine_evidence"],
                 "final_concern_reserve": rows[-1]["concern_reserve"],
-                "final_concern_recalls": rows[-1]["concern_recalls"],
+                "concern_recall_count": recall_end - recall_start,
+                "final_concern_recalls": recall_end,
             }
         )
     return blocks

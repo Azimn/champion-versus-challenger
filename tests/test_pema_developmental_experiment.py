@@ -86,6 +86,8 @@ class DevelopmentalExperimentTests(unittest.TestCase):
             self.assertEqual(block["allocation_counts"]["ROUTINE"], BLOCK_TICKS)
             self.assertEqual(block["allocation_counts"]["CONCERN"], BLOCK_TICKS)
             self.assertEqual(block["exploration_share"], 0.5)
+            self.assertEqual(block["concern_recall_count"], 100)
+            self.assertEqual(block["final_concern_recalls"], (index + 1) * 100)
 
 
 if __name__ == "__main__":
