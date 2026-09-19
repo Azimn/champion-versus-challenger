@@ -8,13 +8,36 @@ from .developmental_bridge import build_runtime_input
 from .developmental_experiment import condition_config
 from .developmental_runtime import DevelopmentalPEMARuntime
 from .developmental_world import DEVELOPMENT_TICKS, generate_history
-from .integrated_runtime import IntegratedPEMARuntime, WorldEvent
+from .integrated_runtime import (
+    ConcernActor,
+    Effect,
+    IntegratedPEMARuntime,
+    Operation,
+    WorldEvent,
+)
 
 
 PROBE_EPOCHS = 6
 PROBE_EPOCH_TICKS = 40
 PROBE_TICKS = PROBE_EPOCHS * PROBE_EPOCH_TICKS
 PROBE_CYCLE_OFFSET = DEVELOPMENT_TICKS // PROBE_EPOCH_TICKS
+
+
+class FrozenProbeConcernActor(ConcernActor):
+    """Concern actor with mature reserve held fixed during evaluation.
+
+    The inherited proposal rule still reads the mature reserve and therefore keeps
+    its causal effect on operation priority. A granted probe recall records the
+    recall and emits the same explicit MEMORY effect, but it cannot consume reserve.
+    This is the minimum evaluation-only change required by the frozen protocol's
+    non-learning probe contract.
+    """
+
+    def execute(self, operation: Operation, tick: int, config) -> list[Effect]:
+        if operation.kind == "RECALL":
+            self.recall_count += 1
+            return [Effect(self.actor_id, "MEMORY", "concern_recall", f"UNRESOLVED_{tick}")]
+        return []
 
 
 class MatureProbeRuntime(IntegratedPEMARuntime):
@@ -91,11 +114,13 @@ def run_mature_probe(mature: IntegratedPEMARuntime) -> dict[str, Any]:
     """Evaluate a completed developmental runtime without learning.
 
     The completed runtime is never mutated. A deep copy receives the six frozen
-    40-tick probe epochs. Feedback is disabled and reserve conversion is zero, so
-    the mature evidence and reserve values remain fixed throughout evaluation.
+    40-tick probe epochs. Feedback is disabled, reserve conversion is zero, and
+    probe recall cannot consume reserve, so mature evidence and reserve remain
+    fixed while continuing to affect operation demand.
     """
     probe = deepcopy(mature)
     probe.__class__ = MatureProbeRuntime
+    probe.concern.__class__ = FrozenProbeConcernActor
     probe.config = replace(
         probe.config,
         ticks=PROBE_TICKS,
