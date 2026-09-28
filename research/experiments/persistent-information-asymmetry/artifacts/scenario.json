@@ -1,0 +1,68 @@
+{
+  "deterministic_seed": 0,
+  "events": [
+    {
+      "actor": "PERSON_A",
+      "channel": "private",
+      "event_id": "E1",
+      "event_type": "social_fact",
+      "semantic": {
+        "b_surprise_preference": "avoid"
+      },
+      "text": "A privately reports that B dislikes birthday surprises and prefers to be asked first.",
+      "timestep": 1
+    },
+    {
+      "actor": "ENVIRONMENT",
+      "channel": "task",
+      "event_id": "E2",
+      "event_type": "decision_prompt",
+      "semantic": {
+        "decision_id": "neutral_greeting"
+      },
+      "text": "Perform the neutral action of greeting B.",
+      "timestep": 2
+    },
+    {
+      "actor": "PERSON_B",
+      "channel": "public",
+      "event_id": "E3",
+      "event_type": "social_fact",
+      "semantic": {
+        "b_surprise_preference": "welcome"
+      },
+      "text": "B publicly says: I changed my mind. For my birthday, surprise me.",
+      "timestep": 3
+    },
+    {
+      "actor": "ENVIRONMENT",
+      "channel": "task",
+      "event_id": "E4",
+      "event_type": "decision_prompt",
+      "semantic": {
+        "decision_id": "birthday_surprise"
+      },
+      "text": "Choose whether to surprise B or ask B first.",
+      "timestep": 4
+    }
+  ],
+  "interviews": [
+    {
+      "question_id": "Q1_PRE_BINDING",
+      "timestep": 5
+    },
+    {
+      "question_id": "Q2_POST_BINDING",
+      "timestep": 7
+    }
+  ],
+  "name": "birthday_surprise_information_asymmetry",
+  "temporary_binding": {
+    "duration_timesteps": 1,
+    "links": [
+      "LANGUAGE <-> MEMORY",
+      "LANGUAGE <-> SOCIAL"
+    ],
+    "timestep": 6
+  }
+}
